@@ -1,0 +1,9 @@
+Let's start smashing this project together , Our selected game is ("Space-Invaders") ...
+
+Members - Role
+1 - Ali | front & backend
+2 - Hussain | backend
+3 - Khalil | frontend
+
+We should have a good knowledge on DOM & JS , Also knowing about some concept such as : 
+- Frames & how to deal with to smothly run the game
