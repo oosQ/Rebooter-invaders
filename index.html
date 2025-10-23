@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Invaders Game</title>
+    <link rel="stylesheet" href="./static/style.css">
+</head>
+
+<body>
+    <!-- Game Status  -->
+    <nav class="navbar">
+        <h1>
+            Score: <span class="result">0</span> |
+            Time: <span class="timer">60</span>s |
+            Level : <span class="level">1</span> |
+            Lives: <span class="lives">3</span> |
+            FPS: <span class="fps-display"  >0</span>
+        </h1>
+    </nav>
+
+    <!-- Grid Container -->
+    <div class="grid"></div>
+
+    <!-- Pause Menu Pop-up -->
+    <div id="gamePopup" class="game-popup">
+        <h2 id="popupTitle">Game Status</h2>
+        <p id="popupMessage">Message</p>
+        <div class="controls">
+            <p>Press P or ESC to pause/resume | Press R to restart</p>
+        </div>
+    </div>
+
+    <script src="./js/main.js" ></script>
+</body>
+
+</html>

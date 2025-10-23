@@ -1,0 +1,159 @@
+html,body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    background: #f8f8f8;
+    padding-top: 2.5rem;
+    box-sizing: border-box;
+}
+
+.grid {
+    margin-top: 2.5rem;
+    flex: 1 1 auto;
+    width: 95vw;
+    height: 80vw;
+    max-width: 80vh;
+    max-height: 80vh;
+    border: solid 1px black;
+    display: flex;
+    flex-wrap: wrap;
+    aspect-ratio: 1 / 1;
+}
+
+.grid div {
+    flex: 1 0 calc(100% / 15);
+    aspect-ratio: 1 / 1;
+    min-width: 0;
+    min-height: 0;
+    box-sizing: border-box;
+}
+
+.grid div.invader {
+    background-color: red;
+    border: solid 1px darkred;
+    box-sizing: border-box;
+    border-radius: 100%;
+    transition: ease-in 0.25s linear;
+    will-change: ease-in, transform;
+}
+
+.shooter {
+    background-color: blue;
+    border: solid 1px darkblue;
+    box-sizing: border-box;
+    border-radius: 100%;
+    transition: ease-in 0.25s linear;
+    will-change: ease-in, transform;
+}
+
+.navbar {
+    width: 100vw;
+    background: #222;
+    color: #fff;
+    padding: 0.5rem 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10;
+}
+
+.result {
+    background: transparent;
+    color: #fff;
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 0;
+    letter-spacing: 2px;
+    text-shadow: 1px 1px 6px #333;
+}
+
+body {
+    padding-top: 4.5rem;
+}
+
+.laser {
+    background-color: green;
+    border: solid 1px darkgreen;
+    box-sizing: border-box;
+    border-radius: 100%;
+    transition: ease-in 0.25s linear;
+    will-change: ease-in, transform;
+}
+
+.boom {
+    background-color: lightcoral;
+    box-sizing: border-box;
+    border-radius: 100%;
+}
+
+/* Game Status Pop-up */
+.game-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    z-index: 1000;
+    font-size: 1.5rem;
+    font-weight: bold;
+    min-width: 300px;
+    border: 2px solid #fff;
+    display: none;
+}
+
+.game-popup.show {
+    display: block;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.game-popup h2 {
+    margin: 0 0 1rem 0;
+    color: #fff;
+    font-size: 2rem;
+}
+
+.game-popup p {
+    margin: 0.5rem 0;
+    color: #ccc;
+    font-size: 1.1rem;
+}
+
+.game-popup .controls {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #444;
+    font-size: 0.9rem;
+    color: #aaa;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
