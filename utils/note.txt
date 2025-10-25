@@ -7,3 +7,5 @@ Members - Role
 
 We should have a good knowledge on DOM & JS , Also knowing about some concept such as : 
 - Frames & how to deal with to smothly run the game
+
+- Guys the size of charachter need to be more big ..
