@@ -7,26 +7,18 @@ body {
 }
 
 body {
-    width: 100vw;
-    height: 100vh;
-    min-height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
     background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
-    padding-top: 4.5rem;
-    box-sizing: border-box;
+    padding: 4.0rem 0;
     font-family: 'Courier New', monospace;
 }
 
 .grid {
     margin-top: 2.5rem;
     flex: 1 1 auto;
-    width: 95vw;
-    height: 80vw;
-    max-width: 80vh;
-    max-height: 80vh;
     border: 8px solid #333;
     border-radius: 20px;
     display: flex;
@@ -50,6 +42,12 @@ body {
     position: relative;
     animation: alienFloat 2s ease-in-out infinite;
     filter: drop-shadow(0 0 10px rgba(255, 71, 87, 0.6));
+}
+
+.grid div.shooter {
+    height: 80px;
+    width: 70px;
+    filter: drop-shadow(0 0 10px rgba(44, 200, 206, 0.6));
 }
 
 .shooter {
