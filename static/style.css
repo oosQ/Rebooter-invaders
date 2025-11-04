@@ -44,6 +44,13 @@ body {
     filter: drop-shadow(0 0 10px rgba(255, 71, 87, 0.6));
 }
 
+.grid div.shooter-invader {
+    background: url('../images/enemieShooter.png') center/120% no-repeat;
+    position: relative;
+    animation: alienFloat 2s ease-in-out infinite;
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
+}
+
 .grid div.shooter {
     height: 80px;
     width: 70px;
@@ -85,6 +92,12 @@ body {
 
 .laser {
     background: url('../images/fire.png') center/contain no-repeat;
+}
+
+.enemy-laser {
+    background: linear-gradient(180deg, #ff4757 0%, #ff6b35 50%, #f7931e 100%);
+    border-radius: 50%;
+    filter: drop-shadow(0 0 5px rgba(255, 71, 87, 0.8));
 }
 
 .boom {
