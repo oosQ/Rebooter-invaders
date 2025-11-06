@@ -11,7 +11,7 @@ body {
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+    background: url('../images/game-background.png') center/cover no-repeat;
     padding: 4.0rem 0;
     font-family: 'Courier New', monospace;
 }
@@ -51,6 +51,26 @@ body {
     filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
 }
 
+.grid div.boss {
+    background: url('../images/boss.png') center/150% no-repeat;
+    position: relative;
+    animation: bossFloat 1.5s ease-in-out infinite;
+    filter: drop-shadow(0 0 15px rgba(255, 0, 0, 0.8));
+    z-index: 5;
+}
+
+@keyframes bossFloat {
+
+    0%,
+    100% {
+        transform: translateY(0) scale(1);
+    }
+
+    50% {
+        transform: translateY(-3px) scale(1.05);
+    }
+}
+
 .grid div.shooter {
     height: 80px;
     width: 70px;
@@ -72,7 +92,6 @@ body {
     top: 0;
     left: 0;
     z-index: 10;
-    border-bottom: 2px solid #74b9ff;
     font-family: 'Courier New', monospace;
 }
 
@@ -100,24 +119,6 @@ body {
     filter: drop-shadow(0 0 5px rgba(255, 71, 87, 0.8));
 }
 
-.boom {
-    background: radial-gradient(circle, #ffff00 0%, #ff6b35 30%, #f7931e 60%, #ff4757 100%);
-    box-sizing: border-box;
-    border-radius: 50%;
-    position: relative;
-    animation: explosion 0.3s ease-out;
-}
-
-.boom::before {
-    content: '💥';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 120%;
-    z-index: 2;
-    animation: explosionText 0.3s ease-out;
-}
 
 .boom::after {
     content: '';
@@ -195,6 +196,29 @@ body {
     border-top: 1px solid #00ff88;
     font-size: 0.9rem;
     color: #74b9ff;
+}
+
+.back-menu-btn {
+    font-family: 'Courier New', monospace;
+    font-size: 1rem;
+    font-weight: bold;
+    padding: 0.8rem 1.5rem;
+    background: linear-gradient(45deg, #ff6b6b, #ff4757);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+}
+
+.back-menu-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 107, 107, 0.5);
+    background: linear-gradient(45deg, #ff5252, #ff3838);
 }
 
 @keyframes fadeIn {

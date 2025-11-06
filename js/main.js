@@ -12,6 +12,7 @@ const levelDisplay = document.querySelector(".level");
 const gamePopup = document.getElementById("gamePopup");
 const popupTitle = document.getElementById("popupTitle");
 const popupMessage = document.getElementById("popupMessage");
+const backToMenuBtn = document.getElementById("backToMenuBtn");
 
 // Game Variables
 const width = 15;
@@ -21,13 +22,33 @@ let shooterIndex = 202;
 let timerId, animationFrameId;
 let score = 0;
 let canShoot = true;
-let timeLeft = 60,lastFpsUpdateTime = 0;
+let timeLeft = 60,
+  lastFpsUpdateTime = 0;
 let lives = 3;
-let frameCount = 0,fps = 0;
+let frameCount = 0,
+  fps = 0;
 let gameOver = false;
 let gamePaused = false;
 let currentLevel = 1;
 const maxLevels = 5;
+
+// High Score System
+function saveHighScore(finalScore, levelReached) {
+  const highScores =
+    JSON.parse(localStorage.getItem("spaceInvadersScores")) || [];
+  const newScore = {
+    score: finalScore,
+    level: levelReached,
+    date: new Date().toLocaleDateString(),
+  };
+
+  highScores.push(newScore);
+  highScores.sort((a, b) => b.score - a.score); // Sort by score descending
+  highScores.splice(10); // Keep only top 10
+
+  localStorage.setItem("spaceInvadersScores", JSON.stringify(highScores));
+  console.log("High score saved:", newScore);
+}
 
 // Add cells to the grid through a loop
 for (let index = 0; index < cellCount; index++) {
@@ -42,38 +63,63 @@ console.log("Square has been created: " + squares);
 
 const levelConfigs = {
   1: {
-    invaders: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,],speed: 800,timeBonus: 60,
+    invaders: [
+      0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
+    ],
+    speed: 800,
+    timeBonus: 60,
   },
   2: {
-    invaders: [30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54],shooterInvaders: [1, 3, 5, 7], speed: 700,timeBonus: 50,
+    invaders: [
+      30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 45, 46, 47, 48, 49, 50, 51, 52,
+      53, 54,
+    ],
+    shooterInvaders: [1, 3, 5, 7],
+    speed: 700,
+    timeBonus: 50,
   },
   3: {
     invaders: [
       45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 60, 61, 62, 63, 64, 65, 66, 67,
       68, 69, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84,
-    ],shooterInvaders: [1, 3, 5, 7, 16, 18, 20, 22],speed: 600,timeBonus: 40,
+    ],
+    shooterInvaders: [1, 3, 5, 7, 16, 18, 20, 22],
+    speed: 600,
+    timeBonus: 40,
   },
   4: {
     invaders: [
       60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 75, 76, 77, 78, 79, 80, 81, 82,
       83, 84, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 105, 106, 107, 108, 109,
       110, 111, 112, 113, 114,
-    ],shooterInvaders: [1, 3, 5, 7, 9, 16, 18, 20, 22, 24],speed: 500,timeBonus: 30,
+    ],
+    shooterInvaders: [1, 3, 5, 7, 9, 16, 18, 20, 22, 24],
+    speed: 500,
+    timeBonus: 30,
   },
   5: {
     invaders: [
       75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 90, 91, 92, 93, 94, 95, 96, 97,
       98, 99, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 120, 121, 122,
-      123, 124, 125, 126, 127, 128, 129, 135, 136, 137, 138, 139, 140, 141, 142,
-      143, 144,
-    ],shooterInvaders: [1, 3, 5, 7, 9, 11, 13, 16, 18, 20, 22, 24, 26, 28, 31, 33, 35, 37, 39, 41, 43],speed: 400,timeBonus: 20, 
+      123, 124, 125, 126, 127,
+    ],
+    shooterInvaders: [1, 3, 5, 7, 11, 13, 16, 18, 20, 22, 24, 26, 28],
+    bossPosition: 9, // Boss in middle of top area
+    speed: 600,
+    timeBonus: 20,
   },
 };
 
 // Current alien invaders array
 let alienInvaders = [];
-let shooterInvaders = []; 
+let shooterInvaders = [];
 let enemyLasers = [];
+
+// Boss variables
+let bossPosition = -1; // -1 means no boss
+let bossHealth = 3; // Boss takes 3 hits to die
+let bossDirection = 1; // 1 for right, -1 for left
+let bossSpeed = 1; // Boss moves every frame
 
 // Add the shooter to the grid
 squares[shooterIndex].classList.add("shooter");
@@ -92,6 +138,15 @@ function initializeLevel(level) {
   // Add shooter invaders if defined for this level (keep them separate)
   if (config.shooterInvaders) {
     shooterInvaders.push(...config.shooterInvaders);
+  }
+
+  // Initialize boss if defined for this level
+  if (config.bossPosition !== undefined) {
+    bossPosition = config.bossPosition;
+    bossHealth = 3; // Reset boss health
+    bossDirection = 1; // Reset boss direction
+  } else {
+    bossPosition = -1; // No boss
   }
 
   invaderMoveInterval = config.speed;
@@ -127,7 +182,7 @@ function nextLevel() {
 
   addInvaders();
 
-  showPopup(` LEVEL ${currentLevel - 1} COMPLETE!`,);
+  showPopup(` LEVEL ${currentLevel - 1} COMPLETE!`);
 
   // Auto-hide popup after 2 seconds and resume game
   setTimeout(hidePopup, 2000);
@@ -135,7 +190,11 @@ function nextLevel() {
 
 function addInvaders() {
   for (let i = 0; i < alienInvaders.length; i++) {
-    if (!invadersRemoved.includes(i) && alienInvaders[i] >= 0 && alienInvaders[i] < squares.length) {
+    if (
+      !invadersRemoved.includes(i) &&
+      alienInvaders[i] >= 0 &&
+      alienInvaders[i] < squares.length
+    ) {
       squares[alienInvaders[i]].classList.add("invader");
     }
   }
@@ -144,6 +203,11 @@ function addInvaders() {
     if (shooterInvaders[i] >= 0 && shooterInvaders[i] < squares.length) {
       squares[shooterInvaders[i]].classList.add("shooter-invader");
     }
+  }
+
+  // Add boss if present
+  if (bossPosition >= 0 && bossPosition < squares.length) {
+    squares[bossPosition].classList.add("boss");
   }
 }
 
@@ -158,6 +222,11 @@ function removeInvaders() {
     if (shooterInvaders[i] >= 0 && shooterInvaders[i] < squares.length) {
       squares[shooterInvaders[i]].classList.remove("shooter-invader");
     }
+  }
+
+  // Remove boss if present
+  if (bossPosition >= 0 && bossPosition < squares.length) {
+    squares[bossPosition].classList.remove("boss");
   }
 }
 
@@ -174,7 +243,8 @@ function moveInvaders() {
   // Move regular invaders (with down movement)
   if (alienInvaders.length > 0) {
     const atLeftEdge = alienInvaders[0] % width === 0;
-    const atRightEdge = alienInvaders[alienInvaders.length - 1] % width === width - 1;
+    const atRightEdge =
+      alienInvaders[alienInvaders.length - 1] % width === width - 1;
 
     if (atRightEdge && isGoingRight) {
       for (let i = 0; i < alienInvaders.length; i++) {
@@ -198,7 +268,8 @@ function moveInvaders() {
   // Move shooter invaders (only horizontal, no down movement)
   if (shooterInvaders.length > 0) {
     const shooterAtLeftEdge = shooterInvaders[0] % width === 0;
-    const shooterAtRightEdge = shooterInvaders[shooterInvaders.length - 1] % width === width - 1;
+    const shooterAtRightEdge =
+      shooterInvaders[shooterInvaders.length - 1] % width === width - 1;
 
     if (shooterAtRightEdge && shooterGoingRight) {
       shooterDirection = -1;
@@ -214,29 +285,65 @@ function moveInvaders() {
     }
   }
 
+  // Move boss (only horizontal movement)
+  if (bossPosition >= 0) {
+    const bossAtLeftEdge = bossPosition % width === 0;
+    const bossAtRightEdge = bossPosition % width === width - 1;
+
+    if (bossAtRightEdge && bossDirection === 1) {
+      bossDirection = -1; // Change to left
+    } else if (bossAtLeftEdge && bossDirection === -1) {
+      bossDirection = 1; // Change to right
+    }
+
+    bossPosition += bossDirection;
+  }
+
   // Check for collision with shooter
   if (
     squares[shooterIndex].classList.contains("invader") ||
     squares[shooterIndex].classList.contains("shooter-invader") ||
+    squares[shooterIndex].classList.contains("boss") ||
     alienInvaders.some((index) => index >= squares.length - width) ||
-    shooterInvaders.some((index) => index >= squares.length - width)
+    shooterInvaders.some((index) => index >= squares.length - width) ||
+    (bossPosition >= 0 && bossPosition >= squares.length - width)
   ) {
     gameOver = true;
     cancelAnimationFrame(animationFrameId);
     clearTimeout(timerId);
-    showPopup("GAME OVER", "Better luck next time!");
+
+    // Save high score when aliens reach the bottom
+    saveHighScore(score, currentLevel);
+
+    showPopup(
+      "💀 GAME OVER!",
+      `Aliens reached Earth! Final Score: ${score}`,
+      true
+    );
     return;
   }
 
-  // Check for level completion (all invaders must be eliminated)
-  if (alienInvaders.length === 0 && shooterInvaders.length === 0) {
+  // Check for level completion (all invaders and boss must be eliminated)
+  if (
+    alienInvaders.length === 0 &&
+    shooterInvaders.length === 0 &&
+    bossPosition === -1
+  ) {
     if (currentLevel < maxLevels) {
       nextLevel();
     } else {
       gameOver = true;
       cancelAnimationFrame(animationFrameId);
       clearTimeout(timerId);
-      showPopup("🎉 CONGRATULATIONS!", `You've completed all ${maxLevels} levels! Final Score: ${score}`);
+
+      // Save high score for game completion
+      saveHighScore(score, currentLevel);
+
+      showPopup(
+        "🎉 CONGRATULATIONS!",
+        `You've completed all ${maxLevels} levels! Final Score: ${score}`,
+        true
+      );
     }
     return;
   }
@@ -295,31 +402,64 @@ function shoot(e) {
 
       squares[currentLaserIndex].classList.add("laser");
 
-      // Check for hit with invader (both regular and shooter invaders)
-      if (squares[currentLaserIndex].classList.contains("invader") || squares[currentLaserIndex].classList.contains("shooter-invader")) {
+      // Check for hit with invader (regular, shooter, or boss)
+      if (
+        squares[currentLaserIndex].classList.contains("invader") ||
+        squares[currentLaserIndex].classList.contains("shooter-invader") ||
+        squares[currentLaserIndex].classList.contains("boss")
+      ) {
         squares[currentLaserIndex].classList.remove("laser");
-        squares[currentLaserIndex].classList.remove("invader");
-        squares[currentLaserIndex].classList.remove("shooter-invader");
-
-        // Remove invader from arrays
-        const invaderIndex = alienInvaders.indexOf(currentLaserIndex);
-        if (invaderIndex !== -1) alienInvaders.splice(invaderIndex, 1);
-
-        const shooterIndex = shooterInvaders.indexOf(currentLaserIndex);
-        if (shooterIndex !== -1) shooterInvaders.splice(shooterIndex, 1);
-
-        squares[currentLaserIndex].classList.add("boom");
-        setTimeout(() => squares[currentLaserIndex].classList.remove("boom"), 250);
         clearInterval(laserId);
 
-        const alienRemoved = alienInvaders.indexOf(currentLaserIndex);
-        invadersRemoved.push(alienRemoved);
+        // Handle boss hit
+        if (squares[currentLaserIndex].classList.contains("boss")) {
+          bossHealth--;
 
-        // Score increases based on level (higher levels give more points)
-        const levelMultiplier = currentLevel;
-        score += 10 * levelMultiplier;
+          // Show hit effect
+          squares[currentLaserIndex].classList.add("boom");
+          setTimeout(
+            () => squares[currentLaserIndex].classList.remove("boom"),
+            250
+          );
+
+          if (bossHealth <= 0) {
+            // Boss defeated
+            squares[currentLaserIndex].classList.remove("boss");
+            bossPosition = -1; // Remove boss
+            score += 100 * currentLevel; // Big bonus for boss
+          } else {
+            // Boss still alive, just hit
+            score += 50 * currentLevel; // Bonus for hitting boss
+          }
+        } else {
+          // Handle regular and shooter invaders
+          squares[currentLaserIndex].classList.remove("invader");
+          squares[currentLaserIndex].classList.remove("shooter-invader");
+
+          // Remove invader from arrays
+          const invaderIndex = alienInvaders.indexOf(currentLaserIndex);
+          if (invaderIndex !== -1) alienInvaders.splice(invaderIndex, 1);
+
+          const shooterInvaderIndex =
+            shooterInvaders.indexOf(currentLaserIndex);
+          if (shooterInvaderIndex !== -1)
+            shooterInvaders.splice(shooterInvaderIndex, 1);
+
+          squares[currentLaserIndex].classList.add("boom");
+          setTimeout(
+            () => squares[currentLaserIndex].classList.remove("boom"),
+            250
+          );
+
+          const alienRemoved = alienInvaders.indexOf(currentLaserIndex);
+          invadersRemoved.push(alienRemoved);
+
+          // Score increases based on level (higher levels give more points)
+          const levelMultiplier = currentLevel;
+          score += 10 * levelMultiplier;
+        }
+
         result.innerHTML = score;
-        console.log(invadersRemoved);
       }
     }
     laserId = setInterval(moveLaser, 100);
@@ -366,7 +506,15 @@ function enemyShoot() {
           gameOver = true;
           cancelAnimationFrame(animationFrameId);
           clearTimeout(timerId);
-          showPopup("GAME OVER", "You've been shot down!");
+
+          // Save high score when shot down
+          saveHighScore(score, currentLevel);
+
+          showPopup(
+            "💥 GAME OVER!",
+            `You've been shot down! Final Score: ${score}`,
+            true
+          );
           return;
         }
       }
@@ -395,10 +543,17 @@ function stopEnemyShooting() {
 }
 
 // Pop-up utility functions
-function showPopup(title, message) {
+function showPopup(title, message, showBackButton = false) {
   popupTitle.textContent = title;
   popupMessage.textContent = message;
   gamePopup.classList.add("show");
+
+  // Show/hide back to menu button based on game over state
+  if (showBackButton || gameOver) {
+    backToMenuBtn.style.display = "block";
+  } else {
+    backToMenuBtn.style.display = "none";
+  }
 }
 
 function hidePopup() {
@@ -442,6 +597,11 @@ function restartGame() {
   alienInvaders.length = 0;
   shooterInvaders.length = 0;
   enemyLasers.length = 0;
+
+  // Reset boss variables
+  bossPosition = -1;
+  bossHealth = 3;
+  bossDirection = 1;
 
   // Stop enemy shooting
   stopEnemyShooting();
@@ -495,14 +655,28 @@ function handleKeyPress(e) {
 // Add event listener for keyboard controls
 document.addEventListener("keydown", handleKeyPress);
 
+// Back to menu button functionality
+backToMenuBtn.addEventListener("click", () => {
+  window.location.href = "home.html";
+});
+
 function loseLife() {
   if (lives > 0) {
     lives--;
     livesDisplay.textContent = lives;
     if (lives === 0) {
+      gameOver = true;
       cancelAnimationFrame(animationFrameId);
       clearInterval(timerId);
-      alert("Game Over!");
+
+      // Save high score
+      saveHighScore(score, currentLevel);
+
+      showPopup(
+        "💀 GAME OVER!",
+        `Final Score: ${score} | Level Reached: ${currentLevel}`,
+        true
+      );
     }
   }
 }
@@ -526,7 +700,15 @@ function updateTimer() {
   } else if (timeLeft <= 0) {
     gameOver = true;
     cancelAnimationFrame(animationFrameId);
-    showPopup("⏰ TIME'S UP!", "Game Over! Press R to restart");
+
+    // Save high score on timeout
+    saveHighScore(score, currentLevel);
+
+    showPopup(
+      "⏰ TIME'S UP!",
+      `Game Over! Final Score: ${score} | Level: ${currentLevel}`,
+      true
+    );
   } else if (!gameOver) {
     timerId = setTimeout(updateTimer, 100);
   }
