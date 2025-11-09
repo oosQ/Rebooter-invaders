@@ -15,7 +15,7 @@ Bugs :
 - When reach level 3 and the two shooter begin in same column and both of shoot hit the players the live be -1 [done]
 - We should keep the game run more smoothly [done]
 - Repsonsivness still not good (index page) [still working on it]
-- Movement of invaders sometime not working properly [still working on it]
+- Movement of invaders sometime not working properly [done]
 
 
 Optional :
