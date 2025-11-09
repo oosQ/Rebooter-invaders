@@ -11,10 +11,11 @@ We should have a good knowledge on DOM & JS , Also knowing about some concept su
 - Guys the size of charachter need to be more big .. [Done]
 
 Bugs : 
-- When the enieme shooter hit player the effect freeze in same place
-- When reach level 3 and the two shooter begin in same column and both of shoot hit the players the live be -1
-- We should keep the game run more smoothly
-- Repsonsivness still not good (index page)
+- When the enieme shooter hit player the effect freeze in same place [done]
+- When reach level 3 and the two shooter begin in same column and both of shoot hit the players the live be -1 [done]
+- We should keep the game run more smoothly [done]
+- Repsonsivness still not good (index page) [still working on it]
+- Movement of invaders sometime not working properly [still working on it]
 
 
 Optional :
@@ -23,3 +24,6 @@ Optional :
 - Allow player to choose the background of the game (sora 2 will help us)
 - In advance level < 3 we can generate a random mistery box (ex. extra life , extra points .. etc)
 - Adding story line to the game (make it more interesting)
+
+General Note :
+- We should ensure our code follow the best practice , also separate the code in different files

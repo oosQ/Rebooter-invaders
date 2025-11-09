@@ -30,6 +30,10 @@ let gamePaused = false;
 let currentLevel = 1;
 const maxLevels = 5;
 
+// Key object for preventing spam shooting
+const keys = {};
+let spaceKeyPressed = false;
+
 // Add cells to the grid through a loop
 for (let index = 0; index < cellCount; index++) {
   const square = document.createElement("div");
@@ -39,7 +43,7 @@ for (let index = 0; index < cellCount; index++) {
 
 // Create an array of all the squares in the grid
 const squares = Array.from(document.querySelectorAll(".grid div"));
-console.log("Square has been created: " + squares);
+console.log("Square has been created: ");
 
 const levels = {
   1: {
@@ -47,7 +51,7 @@ const levels = {
       0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 30,
       31, 32, 33, 34, 35, 36, 37, 38, 39,
     ],
-    speed: 500,
+    speed: 600,
     timeBonus: 60,
   },
   2: {
@@ -146,7 +150,7 @@ function nextLevel() {
   removeInvaders();
   initializeLevel(currentLevel);
   addInvaders();
-  showPopup(`Nice You Reach LEVEL ${currentLevel - 1}`);
+  showPopup(`LEVEL ${currentLevel - 1} Has Been Destroyed!`);
   setTimeout(hidePopup, 2000);
 }
 
@@ -211,7 +215,6 @@ function moveInvaders() {
       direction = -1;
       isGoingRight = false;
     }
-
     if (atLeftEdge && !isGoingRight) {
       for (let i = 0; i < alienInvaders.length; i++) {
         alienInvaders[i] += width - 1;
@@ -219,7 +222,6 @@ function moveInvaders() {
       direction = 1;
       isGoingRight = true;
     }
-
     for (let i = 0; i < alienInvaders.length; i++) {
       alienInvaders[i] += direction;
     }
@@ -384,7 +386,20 @@ function shoot(e) {
     laserId = setInterval(moveLaser, 50);
   }
 }
-document.addEventListener("keydown", shoot);
+
+// Key event handlers to prevent spam shooting
+function handleKeyDown(e) {
+  if (e.key === " " && !keys[e.key]) {
+    keys[e.key] = true;
+    shoot(e);
+  }
+}
+function handleKeyUp(e) {
+  if (e.key === " ") keys[e.key] = false;
+}
+document.addEventListener("keydown", handleKeyDown);
+document.addEventListener("keyup", handleKeyUp);
+
 
 function enemyShoot() {
   if (gameOver || gamePaused || shooterInvaders.length === 0) return;
@@ -463,7 +478,7 @@ function hidePopup() {
 function pauseGame() {
   gamePaused = !gamePaused;
   if (gamePaused) {
-    showPopup("⏸️ GAME PAUSED", "Press P or ESC to resume");
+    showPopup("GAME PAUSED", "Press P or ESC to resume");
     stopEnemyShooting();
   } else {
     hidePopup();
@@ -474,6 +489,12 @@ function pauseGame() {
   if (!gamePaused && !gameOver)
     animationFrameId = requestAnimationFrame(animateInvaders);
 }
+
+addEventListener("click", function (e) {
+  if (e.target === backToMenuBtn) {
+    this.window.location.href = "home.html";
+  }
+});
 
 function restartGame() {
   // Reset All game values
@@ -557,10 +578,7 @@ function loseLife() {
       gameOver = true;
       cancelAnimationFrame(animationFrameId);
       clearInterval(timerId);
-      showPopup(
-        "GAME OVER!",
-        `Final Score: ${score} | Level Reached: ${currentLevel}`
-      );
+      showPopup("GAME OVER!",`Final Score: ${score}`);
     }
   }
 }
@@ -585,7 +603,7 @@ function updateTimer() {
     gameOver = true;
     cancelAnimationFrame(animationFrameId);
 
-    showPopup("⏰ TIME'S UP!",`Game Over! Final Score: ${score} | Level: ${currentLevel}`);
+    showPopup("TIME'S UP!",`Game Over! Final Score: ${score}`);
   } else if (!gameOver) {
     timerId = setTimeout(updateTimer, 100);
   }
