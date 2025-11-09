@@ -1,0 +1,170 @@
+@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap');
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Pixelify Sans", sans-serif;
+    color: white;
+    background: url('../images/background.gif') center/cover no-repeat;
+}
+
+/* Home Container */
+.home-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.menu-container {
+    text-align: center;
+    color: white;
+}
+
+.welcome-title {
+    font-size: 4rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.welcome-subtitle {
+    font-size: 1.4rem;
+    margin-bottom: 3rem;
+    color: #ddd;
+}
+
+.menu-dialog {
+    background: rgba(37, 37, 37, 0.1);
+    border-radius: 20px;
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    min-width: 450px;
+}
+
+.menu-dialog .menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.dialog-content {
+    background: rgb(71, 71, 71);
+    border-radius: 20px;
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    min-width: 350px;
+}
+.leaderboard-list p {
+    text-align: center;
+}
+
+.menu-btn , .dialog-btn {
+    font-family: 'pixelify sans', sans-serif;
+    font-size: 1.3rem;
+    font-weight: bold;
+    padding: 1.2rem 2.5rem;
+    background: linear-gradient(45deg, #3742fa);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.menu-btn:hover , .dialog-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(55, 66, 250, 0.5);
+    background: linear-gradient(45deg, #4834df, #3742fa);
+}
+
+.dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: dialogFadeIn 0.3s ease-out;
+}
+
+.dialog-content h2 {
+    font-size: 2.2rem;
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+ul li {
+    margin: 0.5rem 0;
+    font-size: 1.1rem;
+    color: #ffffff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+strong {
+    color: #ffdd57;
+}
+
+@keyframes dialogFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes dialogSlideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .welcome-title {
+        font-size: 2.5rem;
+    }
+
+    .welcome-subtitle {
+        font-size: 1.1rem;
+    }
+
+    .menu-dialog {
+        min-width: 280px;
+        padding: 2rem;
+    }
+
+    .menu-btn {
+        font-size: 1.1rem;
+        padding: 1rem 2rem;
+    }
+
+    .dialog-content {
+        margin: 1rem;
+        padding: 2rem;
+        max-width: calc(100% - 2rem);
+    }
+}
