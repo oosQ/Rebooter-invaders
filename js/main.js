@@ -204,8 +204,9 @@ function moveInvaders() {
   removeInvaders();
 
   if (alienInvaders.length > 0) {
-    const atLeftEdge = alienInvaders[0] % width === 0;
-    const atRightEdge = alienInvaders[alienInvaders.length - 1] % width === width - 1;
+   const atLeftEdge = alienInvaders.some(invader => invader % width === 0);
+    const atRightEdge = alienInvaders.some(invader => invader % width === width - 1);
+
 
     // Invaders movement
     if (atRightEdge && isGoingRight) {
