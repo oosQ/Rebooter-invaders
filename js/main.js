@@ -230,8 +230,8 @@ function moveInvaders() {
 
   // Shooter invaders movement
   if (shooterInvaders.length > 0) {
-    const shooterAtLeftEdge = shooterInvaders[0] % width === 0;
-    const shooterAtRightEdge = shooterInvaders[shooterInvaders.length - 1] % width === width - 1;
+    const shooterAtLeftEdge = shooterInvaders.some(shooter=>shooter % width === 0);
+    const shooterAtRightEdge = shooterInvaders.some(shooter=>shooter % width === width - 1);
     if (shooterAtRightEdge && shooterGoingRight) {
       shooterDirection = -1;
       shooterGoingRight = false;
