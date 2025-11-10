@@ -84,13 +84,14 @@ const levels = {
   },
   5: {
     invaders: [
-      75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 90, 91, 92, 93, 94, 95, 96, 97,
-      98, 99, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 120, 121, 122,
-      123, 124, 125, 126, 127,
+      75, 76, 77, 78, 79, 80, 81, 82, 83, 84,
+      90, 91, 92, 93, 94, 95, 96, 97, 98, 99,
+      105, 106, 107, 108, 109, 110, 111, 112, 113, 114,
+      120, 121, 122, 123, 124, 125, 126, 127, 128, 129,
     ],
     shooterInvaders: [1, 3, 5, 7, 11, 13, 16, 18, 20, 22, 24, 26, 28],
     bossPosition: 9,
-    speed: 500,
+    speed: 550,
     timeBonus: 20,
   },
 };
@@ -146,12 +147,13 @@ function initializeLevel(level) {
 
 function nextLevel() {
   currentLevel++;
+  let levelUpAudio = new Audio('./utils/level-up.mp3');
+  levelUpAudio.volume = 0.2;
+  levelUpAudio.play();
   stopEnemyShooting();
   removeInvaders();
   initializeLevel(currentLevel);
   addInvaders();
-  showPopup(`LEVEL ${currentLevel - 1} Has Been Destroyed!`);
-  setTimeout(hidePopup, 2000);
 }
 
 function addInvaders() {
@@ -284,6 +286,10 @@ function moveInvaders() {
       gameOver = true;
       cancelAnimationFrame(animationFrameId);
       clearTimeout(timerId);
+      let congratsAudio = new Audio('./utils/congrat.mp3');
+      let winAudio = new Audio('./utils/winning.mp3');
+      congratsAudio.play();
+      setTimeout(() => { winAudio.play(); }, 2000);
       showPopup("CONGRATULATIONS!",`You've completed all ${maxLevels} levels! Final Score: ${score}`);
     }
     return;
@@ -330,7 +336,9 @@ function shoot(e) {
 
     let laserId;
     let currentLaserIndex = shooterIndex;
-
+    let audio = new Audio('./utils/shooter-fire.mp3');
+    audio.volume = 0.2;
+    audio.play();
     function moveLaser() {
       squares[currentLaserIndex].classList.remove("laser");
       currentLaserIndex -= width;
@@ -348,6 +356,9 @@ function shoot(e) {
         squares[currentLaserIndex].classList.contains("shooter-invader") ||
         squares[currentLaserIndex].classList.contains("boss")
       ) {
+        let punchAudio = new Audio('./utils/punch.mp3');
+        punchAudio.volume = 0.2;
+        punchAudio.play();
         squares[currentLaserIndex].classList.remove("laser");
         clearInterval(laserId);
 
@@ -409,10 +420,11 @@ function enemyShoot() {
   shooterInvaders.forEach((shooterPosition) => {
     if (!shooterInvaders.includes(shooterPosition)) return;
     let enemyLaserIndex = shooterPosition;
-
+    let audio = new Audio('./utils/fire.mp3');
+    audio.play();
     function moveEnemyLaser() {
       if (enemyLaserIndex >= 0 && enemyLaserIndex < squares.length)
-        squares[enemyLaserIndex].classList.remove("laser");
+      squares[enemyLaserIndex].classList.remove("enemy-laser");
       enemyLaserIndex += width;
 
       // Check if laser reached bottom
@@ -421,11 +433,14 @@ function enemyShoot() {
         return;
       }
 
-      squares[enemyLaserIndex].classList.add("laser");
+      squares[enemyLaserIndex].classList.add("enemy-laser");
 
       // Check if laser hits the player
       if (squares[enemyLaserIndex].classList.contains("shooter")) {
-        squares[enemyLaserIndex].classList.remove("laser");
+        let hurtAudio = new Audio('./utils/hurt.mp3');
+        hurtAudio.volume = 0.2;
+        hurtAudio.play();
+        squares[enemyLaserIndex].classList.remove("enemy-laser");
         clearInterval(enemyLaserId);
 
         lives--;
@@ -443,6 +458,16 @@ function enemyShoot() {
           gameOver = true;
           cancelAnimationFrame(animationFrameId);
           clearTimeout(timerId);
+          let gameOverAudio = new Audio('./utils/game-over.mp3');
+          let failAudio = new Audio('./utils/fail-sound.mp3');
+          if (currentLevel == 5) {
+            let bossLaughingAudio = new Audio('./utils/Boss-Laughing.mp3');
+            bossLaughingAudio.play();
+            setTimeout(() => { gameOverAudio.play(); }, 2000);
+          } else {
+            failAudio.play();
+            setTimeout(() => { gameOverAudio.play(); }, 3000);
+          }
           showPopup("GAME OVER!",`You've been shot down! Your Final Score: ${score}`);
           return;
         }
