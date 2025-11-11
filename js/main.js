@@ -150,7 +150,7 @@ function initializeLevel(level) {
 function nextLevel() {
   currentLevel++;
   let levelUpAudio = new Audio('./utils/sounds/level-up.mp3');
-  levelUpAudio.volume = 0.2;
+  levelUpAudio.volume = 0.5;
   levelUpAudio.play();
   stopEnemyShooting();
   removeInvaders();
@@ -253,9 +253,9 @@ function moveInvaders() {
   if (bossPosition >= 0) {
     const bossAtLeftEdge = bossPosition % width === 0;
     const bossAtRightEdge = bossPosition % width === width - 1;
-    if (bossAtRightEdge && bossDirection === 1 && squares[bossPosition].classList.contains("shooter-invader") === false) {
+    if (bossAtRightEdge && bossDirection === 1) {
       bossDirection = -1;
-    } else if (bossAtLeftEdge && bossDirection === -1 && squares[bossPosition].classList.contains("shooter-invader") === false) {
+    } else if (bossAtLeftEdge && bossDirection === -1 ) {
       bossDirection = 1;
     }
     bossPosition += bossDirection;
@@ -277,7 +277,7 @@ function moveInvaders() {
     cancelAnimationFrame(animationFrameId);
     clearTimeout(timerId);
     let gameOverAudio = new Audio('./utils/sounds/game-over.mp3');
-    gameOverAudio.volume = 0.2;
+    gameOverAudio.volume = 0.5;
     gameOverAudio.play();
     resumeBtn.style.display = "none";
     showPopup("GAME OVER!",`You Failed to prove yourself! Final Score: ${score}`);
@@ -296,6 +296,7 @@ function moveInvaders() {
       let winAudio = new Audio('./utils/sounds/winning.mp3');
       congratsAudio.play();
       setTimeout(() => { winAudio.play(); }, 2000);
+      resumeBtn.style.display = "none";
       showPopup("CONGRATULATIONS!",`You've completed all ${maxLevels} levels! Final Score: ${score}`);
     }
     return;
@@ -362,7 +363,7 @@ function shoot(e) {
         squares[currentLaserIndex].classList.contains("shooter-invader") ||
         squares[currentLaserIndex].classList.contains("boss")
       ) {
-        let punchAudio = new Audio('./utils/punch.mp3');
+        let punchAudio = new Audio('./utils/sounds/punch.mp3');
         punchAudio.volume = 0.2;
         punchAudio.play();
         squares[currentLaserIndex].classList.remove("laser");
@@ -371,6 +372,8 @@ function shoot(e) {
         // Boss hit logic
         if (squares[currentLaserIndex].classList.contains("boss")) {
           bossHealth--;
+          squares[currentLaserIndex].classList.add("boom");
+          setTimeout(() => squares[currentLaserIndex].classList.remove("boom"), 150);
           if (bossHealth <= 0) {
             squares[currentLaserIndex].classList.remove("boss");
             bossPosition = -1;
@@ -577,6 +580,7 @@ function restartGame() {
       "shooter-invader",
       "shooter",
       "laser",
+      "boss",
       "boom"
     );
   }
@@ -623,7 +627,7 @@ function loseLife() {
       cancelAnimationFrame(animationFrameId);
       clearInterval(timerId);
       let gameOverAudio = new Audio('./utils/sounds/game-over.mp3');
-      gameOverAudio.volume = 0.2;
+      gameOverAudio.volume = 0.5;
       gameOverAudio.play();
       resumeBtn.style.display = "none";
       showPopup("GAME OVER!",`Final Score: ${score}`);
@@ -652,7 +656,7 @@ function updateTimer() {
     cancelAnimationFrame(animationFrameId);
     clearTimeout(timerId);
     let timeUpAudio = new Audio('./utils/sounds/times-up.mp3');
-    timeUpAudio.volume = 0.2;
+    timeUpAudio.volume = 0.5;
     timeUpAudio.play();
 
     resumeBtn.style.display = "none";
