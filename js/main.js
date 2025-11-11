@@ -13,6 +13,8 @@ const gamePopup = document.getElementById("gamePopup");
 const popupTitle = document.getElementById("popupTitle");
 const popupMessage = document.getElementById("popupMessage");
 const backToMenuBtn = document.getElementById("backToMenuBtn");
+const restartBtn = document.getElementById("restartBtn");
+const resumeBtn = document.getElementById("resumeBtn");
 
 // Game Variables
 const width = 15;
@@ -147,7 +149,7 @@ function initializeLevel(level) {
 
 function nextLevel() {
   currentLevel++;
-  let levelUpAudio = new Audio('./utils/level-up.mp3');
+  let levelUpAudio = new Audio('./utils/sounds/level-up.mp3');
   levelUpAudio.volume = 0.2;
   levelUpAudio.play();
   stopEnemyShooting();
@@ -251,9 +253,9 @@ function moveInvaders() {
   if (bossPosition >= 0) {
     const bossAtLeftEdge = bossPosition % width === 0;
     const bossAtRightEdge = bossPosition % width === width - 1;
-    if (bossAtRightEdge && bossDirection === 1) {
+    if (bossAtRightEdge && bossDirection === 1 && squares[bossPosition].classList.contains("shooter-invader") === false) {
       bossDirection = -1;
-    } else if (bossAtLeftEdge && bossDirection === -1) {
+    } else if (bossAtLeftEdge && bossDirection === -1 && squares[bossPosition].classList.contains("shooter-invader") === false) {
       bossDirection = 1;
     }
     bossPosition += bossDirection;
@@ -274,6 +276,10 @@ function moveInvaders() {
     gameOver = true;
     cancelAnimationFrame(animationFrameId);
     clearTimeout(timerId);
+    let gameOverAudio = new Audio('./utils/sounds/game-over.mp3');
+    gameOverAudio.volume = 0.2;
+    gameOverAudio.play();
+    resumeBtn.style.display = "none";
     showPopup("GAME OVER!",`You Failed to prove yourself! Final Score: ${score}`);
     return;
   }
@@ -286,8 +292,8 @@ function moveInvaders() {
       gameOver = true;
       cancelAnimationFrame(animationFrameId);
       clearTimeout(timerId);
-      let congratsAudio = new Audio('./utils/congrat.mp3');
-      let winAudio = new Audio('./utils/winning.mp3');
+      let congratsAudio = new Audio('./utils/sounds/congrat.mp3');
+      let winAudio = new Audio('./utils/sounds/winning.mp3');
       congratsAudio.play();
       setTimeout(() => { winAudio.play(); }, 2000);
       showPopup("CONGRATULATIONS!",`You've completed all ${maxLevels} levels! Final Score: ${score}`);
@@ -336,7 +342,7 @@ function shoot(e) {
 
     let laserId;
     let currentLaserIndex = shooterIndex;
-    let audio = new Audio('./utils/shooter-fire.mp3');
+    let audio = new Audio('./utils/sounds/shooter-fire.mp3');
     audio.volume = 0.2;
     audio.play();
     function moveLaser() {
@@ -420,7 +426,7 @@ function enemyShoot() {
   shooterInvaders.forEach((shooterPosition) => {
     if (!shooterInvaders.includes(shooterPosition)) return;
     let enemyLaserIndex = shooterPosition;
-    let audio = new Audio('./utils/fire.mp3');
+    let audio = new Audio('./utils/sounds/fire.mp3');
     audio.play();
     function moveEnemyLaser() {
       if (enemyLaserIndex >= 0 && enemyLaserIndex < squares.length)
@@ -437,8 +443,7 @@ function enemyShoot() {
 
       // Check if laser hits the player
       if (squares[enemyLaserIndex].classList.contains("shooter")) {
-        let hurtAudio = new Audio('./utils/hurt.mp3');
-        hurtAudio.volume = 0.2;
+        let hurtAudio = new Audio('./utils/sounds/hurt.mp3');
         hurtAudio.play();
         squares[enemyLaserIndex].classList.remove("enemy-laser");
         clearInterval(enemyLaserId);
@@ -458,16 +463,17 @@ function enemyShoot() {
           gameOver = true;
           cancelAnimationFrame(animationFrameId);
           clearTimeout(timerId);
-          let gameOverAudio = new Audio('./utils/game-over.mp3');
-          let failAudio = new Audio('./utils/fail-sound.mp3');
+          let gameOverAudio = new Audio('./utils/sounds/game-over.mp3');
+          let failAudio = new Audio('./utils/sounds/fail-sound.mp3');
           if (currentLevel == 5) {
-            let bossLaughingAudio = new Audio('./utils/Boss-Laughing.mp3');
+            let bossLaughingAudio = new Audio('./utils/sounds/Boss-Laughing.mp3');
             bossLaughingAudio.play();
             setTimeout(() => { gameOverAudio.play(); }, 2000);
           } else {
             failAudio.play();
             setTimeout(() => { gameOverAudio.play(); }, 3000);
           }
+          resumeBtn.style.display = "none";
           showPopup("GAME OVER!",`You've been shot down! Your Final Score: ${score}`);
           return;
         }
@@ -502,10 +508,12 @@ function hidePopup() {
 
 // Pause and Restart Functions
 function pauseGame() {
+  if (gameOver) return;
   gamePaused = !gamePaused;
   if (gamePaused) {
-    showPopup("GAME PAUSED", "Press P or ESC to resume");
+    resumeBtn.style.display = "flex";
     stopEnemyShooting();
+    showPopup("GAME PAUSED", "Take a breather, warrior!");
   } else {
     hidePopup();
     if (currentLevel >= 2) {
@@ -520,6 +528,16 @@ addEventListener("click", function (e) {
   if (e.target === backToMenuBtn) {
     this.window.location.href = "home.html";
   }
+});
+addEventListener("click", function (e) {
+  if (e.target === restartBtn) {
+    restartGame();
+    hidePopup();
+  }
+});
+resumeBtn.addEventListener("click", function () {
+  hidePopup();
+  pauseGame();
 });
 
 function restartGame() {
@@ -582,7 +600,7 @@ function restartGame() {
 
 function handleKeyPress(e) {
   console.log("Key pressed:", e.key);
-  if (e.key.toLowerCase() === "p" || e.key === "Escape") {
+  if ((e.key.toLowerCase() === "p" || e.key === "Escape") && !gameOver) {
     e.preventDefault();
     pauseGame();
   }
@@ -604,6 +622,10 @@ function loseLife() {
       gameOver = true;
       cancelAnimationFrame(animationFrameId);
       clearInterval(timerId);
+      let gameOverAudio = new Audio('./utils/sounds/game-over.mp3');
+      gameOverAudio.volume = 0.2;
+      gameOverAudio.play();
+      resumeBtn.style.display = "none";
       showPopup("GAME OVER!",`Final Score: ${score}`);
     }
   }
@@ -628,7 +650,12 @@ function updateTimer() {
   } else if (timeLeft <= 0) {
     gameOver = true;
     cancelAnimationFrame(animationFrameId);
+    clearTimeout(timerId);
+    let timeUpAudio = new Audio('./utils/sounds/times-up.mp3');
+    timeUpAudio.volume = 0.2;
+    timeUpAudio.play();
 
+    resumeBtn.style.display = "none";
     showPopup("TIME'S UP!",`Game Over! Final Score: ${score}`);
   } else if (!gameOver) {
     timerId = setTimeout(updateTimer, 100);

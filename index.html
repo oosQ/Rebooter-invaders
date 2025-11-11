@@ -4,32 +4,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Space Invaders Game</title>
+    <title>Rebooter01 - Invaders</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="./static/style.css">
 </head>
 
 <body>
-    <!-- Game Status  -->
+    <!-- Game Status Bar -->
     <nav class="navbar">
-        <h1>
-            Score: <span class="result">0</span> |
-            Time: <span class="timer">60</span>s |
-            Level : <span class="level">1</span> |
-            Lives: <span class="lives">3</span> |
-            FPS: <span class="fps-display">0</span>
-        </h1>
+        <div class="stat-item">
+            <i class="fa-solid fa-trophy stat-icon"></i>
+            <div class="stat-content">
+                <span class="stat-label">Score</span>
+                <span class="stat-value result">0</span>
+            </div>
+        </div>
+        
+        <div class="stat-item">
+            <i class="fa-solid fa-clock stat-icon"></i>
+            <div class="stat-content">
+                <span class="stat-label">Time</span>
+                <span class="stat-value timer">60</span>
+            </div>
+        </div>
+        
+        <div class="stat-item">
+            <i class="fa-solid fa-ranking-star stat-icon"></i>
+            <div class="stat-content">
+                <span class="stat-label">Level</span>
+                <span class="stat-value level">1</span>
+            </div>
+        </div>
+        
+        <div class="stat-item">
+            <i class="fa-solid fa-heart stat-icon lives-icon"></i>
+            <div class="stat-content">
+                <span class="stat-label">Lives</span>
+                <span class="stat-value lives">3</span>
+            </div>
+        </div>
+        
+        <div class="stat-item">
+            <i class="fa-solid fa-gauge-high stat-icon"></i>
+            <div class="stat-content">
+                <span class="stat-label">FPS</span>
+                <span class="stat-value fps-display">0</span>
+            </div>
+        </div>
     </nav>
 
     <!-- Grid Container -->
-    <div class="grid"></div>
+    <div class="game-container">
+        <div class="grid"></div>
+    </div>
 
     <!-- Pause Menu Pop-up -->
     <div id="gamePopup" class="game-popup">
-        <h2 id="popupTitle">Game Status</h2>
-        <p id="popupMessage">Message</p>
-        <div class="controls">
-            <p>Press P or ESC to pause/resume | Press R to restart</p>
-            <button id="backToMenuBtn" class="back-menu-btn"> BACK TO MENU</button>
+        <div class="popup-content">
+            <h2 id="popupTitle">Game Paused</h2>
+            <p id="popupMessage"></p>
+            <div class="buttons">
+                <button id="resumeBtn" class="back-menu-btn"><i class="fa-solid fa-play"></i>Resume</button>
+                <button id="restartBtn" class="back-menu-btn"><i class="fa-solid fa-rotate"></i>Restart</button>
+            </div>
+            <button id="backToMenuBtn" class="back-menu-btn"><i class="fa-solid fa-home"></i>Main Menu</button>
         </div>
     </div>
 
