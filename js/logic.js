@@ -1,5 +1,5 @@
 // Game Logic and State Management Module
-import { width, cellCount, levels, maxLevels } from './config.js';
+import { width, cellCount, levels, maxLevels } from "./config.js";
 
 // DOM Elements Object
 export const DOM = {
@@ -14,7 +14,7 @@ export const DOM = {
   popupMessage: document.getElementById("popupMessage"),
   backToMenuBtn: document.getElementById("backToMenuBtn"),
   restartBtn: document.getElementById("restartBtn"),
-  resumeBtn: document.getElementById("resumeBtn")
+  resumeBtn: document.getElementById("resumeBtn"),
 };
 
 // Game State Object
@@ -48,7 +48,7 @@ export const gameState = {
   lastInvaderMove: 0,
   enemyShootTimer: null,
   keys: {},
-  spaceKeyPressed: false
+  spaceKeyPressed: false,
 };
 
 // Initialize Grid
@@ -82,7 +82,8 @@ export function initializeLevel(level) {
 
   gameState.alienInvaders.push(...currentLvl.invaders);
 
-  if (currentLvl.shooterInvaders) gameState.shooterInvaders.push(...currentLvl.shooterInvaders);
+  if (currentLvl.shooterInvaders)
+    gameState.shooterInvaders.push(...currentLvl.shooterInvaders);
 
   if (currentLvl.bossPosition !== undefined) {
     gameState.bossPosition = currentLvl.bossPosition;
@@ -109,43 +110,66 @@ export function initializeLevel(level) {
 
 export function addInvaders() {
   for (let i = 0; i < gameState.alienInvaders.length; i++) {
-    if (!gameState.invadersRemoved.includes(i) && gameState.alienInvaders[i] >= 0 && gameState.alienInvaders[i] < gameState.squares.length) {
+    if (
+      !gameState.invadersRemoved.includes(i) &&
+      gameState.alienInvaders[i] >= 0 &&
+      gameState.alienInvaders[i] < gameState.squares.length
+    ) {
       gameState.squares[gameState.alienInvaders[i]].classList.add("invader");
     }
   }
 
   for (let i = 0; i < gameState.shooterInvaders.length; i++) {
-    if (gameState.shooterInvaders[i] >= 0 && gameState.shooterInvaders[i] < gameState.squares.length) {
-      gameState.squares[gameState.shooterInvaders[i]].classList.add("shooter-invader");
+    if (
+      gameState.shooterInvaders[i] >= 0 &&
+      gameState.shooterInvaders[i] < gameState.squares.length
+    ) {
+      gameState.squares[gameState.shooterInvaders[i]].classList.add(
+        "shooter-invader"
+      );
     }
   }
 
-  if (gameState.bossPosition >= 0 && gameState.bossPosition < gameState.squares.length) {
+  if (
+    gameState.bossPosition >= 0 &&
+    gameState.bossPosition < gameState.squares.length
+  ) {
     gameState.squares[gameState.bossPosition].classList.add("boss");
   }
 }
 
 export function removeInvaders() {
   for (let i = 0; i < gameState.alienInvaders.length; i++) {
-    if (gameState.alienInvaders[i] >= 0 && gameState.alienInvaders[i] < gameState.squares.length) {
+    if (
+      gameState.alienInvaders[i] >= 0 &&
+      gameState.alienInvaders[i] < gameState.squares.length
+    ) {
       gameState.squares[gameState.alienInvaders[i]].classList.remove("invader");
     }
   }
 
   for (let i = 0; i < gameState.shooterInvaders.length; i++) {
-    if (gameState.shooterInvaders[i] >= 0 && gameState.shooterInvaders[i] < gameState.squares.length) {
-      gameState.squares[gameState.shooterInvaders[i]].classList.remove("shooter-invader");
+    if (
+      gameState.shooterInvaders[i] >= 0 &&
+      gameState.shooterInvaders[i] < gameState.squares.length
+    ) {
+      gameState.squares[gameState.shooterInvaders[i]].classList.remove(
+        "shooter-invader"
+      );
     }
   }
 
-  if (gameState.bossPosition >= 0 && gameState.bossPosition < gameState.squares.length) {
+  if (
+    gameState.bossPosition >= 0 &&
+    gameState.bossPosition < gameState.squares.length
+  ) {
     gameState.squares[gameState.bossPosition].classList.remove("boss");
   }
 }
 
 export function nextLevel() {
   gameState.currentLevel++;
-  let levelUpAudio = new Audio('./utils/sounds/level-up.mp3');
+  let levelUpAudio = new Audio("./utils/sounds/level-up.mp3");
   levelUpAudio.volume = 0.5;
   levelUpAudio.play();
   stopEnemyShooting();
@@ -161,8 +185,12 @@ export function moveInvaders() {
   removeInvaders();
 
   if (gameState.alienInvaders.length > 0) {
-    const atLeftEdge = gameState.alienInvaders.some(invader => invader % width === 0);
-    const atRightEdge = gameState.alienInvaders.some(invader => invader % width === width - 1);
+    const atLeftEdge = gameState.alienInvaders.some(
+      (invader) => invader % width === 0
+    );
+    const atRightEdge = gameState.alienInvaders.some(
+      (invader) => invader % width === width - 1
+    );
 
     if (atRightEdge && gameState.isGoingRight) {
       for (let i = 0; i < gameState.alienInvaders.length; i++) {
@@ -184,8 +212,12 @@ export function moveInvaders() {
   }
 
   if (gameState.shooterInvaders.length > 0) {
-    const shooterAtLeftEdge = gameState.shooterInvaders.some(shooter => shooter % width === 0);
-    const shooterAtRightEdge = gameState.shooterInvaders.some(shooter => shooter % width === width - 1);
+    const shooterAtLeftEdge = gameState.shooterInvaders.some(
+      (shooter) => shooter % width === 0
+    );
+    const shooterAtRightEdge = gameState.shooterInvaders.some(
+      (shooter) => shooter % width === width - 1
+    );
     if (shooterAtRightEdge && gameState.shooterGoingRight) {
       gameState.shooterDirection = -1;
       gameState.shooterGoingRight = false;
@@ -224,27 +256,54 @@ export function moveInvaders() {
     gameState.gameOver = true;
     cancelAnimationFrame(gameState.animationFrameId);
     clearTimeout(gameState.timerId);
-    let gameOverAudio = new Audio('./utils/sounds/game-over.mp3');
+    stopEnemyShooting();
+
+    // Add dramatic flash effect
+    DOM.grid.style.filter = "brightness(2) saturate(2)";
+    setTimeout(() => {
+      DOM.grid.style.filter = "brightness(0.3) hue-rotate(320deg)";
+    }, 100);
+    setTimeout(() => {
+      DOM.grid.style.filter = "";
+    }, 300);
+
+    let gameOverAudio = new Audio("./utils/sounds/game-over.mp3");
     gameOverAudio.volume = 0.5;
     gameOverAudio.play();
     DOM.resumeBtn.style.display = "none";
-    showPopup("GAME OVER!", `You Failed to prove yourself! Final Score: ${gameState.score}`);
+
+    // Show popup after brief delay for effect
+    setTimeout(() => {
+      showPopup(
+        "GAME OVER!",
+        `The invaders have reached you! Final Score: ${gameState.score}`
+      );
+    }, 400);
     return;
   }
 
-  if (gameState.alienInvaders.length === 0 && gameState.shooterInvaders.length === 0 && gameState.bossPosition === -1) {
+  if (
+    gameState.alienInvaders.length === 0 &&
+    gameState.shooterInvaders.length === 0 &&
+    gameState.bossPosition === -1
+  ) {
     if (gameState.currentLevel < maxLevels) {
       nextLevel();
     } else {
       gameState.gameOver = true;
       cancelAnimationFrame(gameState.animationFrameId);
       clearTimeout(gameState.timerId);
-      let congratsAudio = new Audio('./utils/sounds/congrat.mp3');
-      let winAudio = new Audio('./utils/sounds/winning.mp3');
+      let congratsAudio = new Audio("./utils/sounds/congrat.mp3");
+      let winAudio = new Audio("./utils/sounds/winning.mp3");
       congratsAudio.play();
-      setTimeout(() => { winAudio.play(); }, 2000);
+      setTimeout(() => {
+        winAudio.play();
+      }, 2000);
       DOM.resumeBtn.style.display = "none";
-      showPopup("CONGRATULATIONS!", `You've completed all ${maxLevels} levels! Final Score: ${gameState.score}`);
+      showPopup(
+        "CONGRATULATIONS!",
+        `You've completed all ${maxLevels} levels! Final Score: ${gameState.score}`
+      );
     }
     return;
   }
@@ -255,7 +314,7 @@ export function calculateFPS() {
   gameState.frameCount++;
   const currentTime = performance.now();
   const elapsed = currentTime - gameState.lastFpsUpdateTime;
-  
+
   if (elapsed >= 1000) {
     gameState.fps = Math.round((gameState.frameCount * 1000) / elapsed);
     DOM.fpsDisplay.innerHTML = `${gameState.fps}`;
@@ -266,12 +325,17 @@ export function calculateFPS() {
 
 // Enemy Shooting
 export function enemyShoot() {
-  if (gameState.gameOver || gameState.gamePaused || gameState.shooterInvaders.length === 0) return;
+  if (
+    gameState.gameOver ||
+    gameState.gamePaused ||
+    gameState.shooterInvaders.length === 0
+  )
+    return;
 
   gameState.shooterInvaders.forEach((shooterPosition) => {
     if (!gameState.shooterInvaders.includes(shooterPosition)) return;
     let enemyLaserIndex = shooterPosition;
-    let audio = new Audio('./utils/sounds/fire.mp3');
+    let audio = new Audio("./utils/sounds/fire.mp3");
     audio.play();
     function moveEnemyLaser() {
       if (enemyLaserIndex >= 0 && enemyLaserIndex < gameState.squares.length)
@@ -286,7 +350,7 @@ export function enemyShoot() {
       gameState.squares[enemyLaserIndex].classList.add("enemy-laser");
 
       if (gameState.squares[enemyLaserIndex].classList.contains("shooter")) {
-        let hurtAudio = new Audio('./utils/sounds/hurt.mp3');
+        let hurtAudio = new Audio("./utils/sounds/hurt.mp3");
         hurtAudio.play();
         gameState.squares[enemyLaserIndex].classList.remove("enemy-laser");
         clearInterval(enemyLaserId);
@@ -298,25 +362,36 @@ export function enemyShoot() {
         setTimeout(() => {
           let shooter = document.getElementById(gameState.shooterIndex);
           shooter.style.filter = "drop-shadow(0 0 10px rgba(255, 71, 87, 0.6))";
-          setTimeout(() => { shooter.style.filter = ""; }, 400);
+          setTimeout(() => {
+            shooter.style.filter = "";
+          }, 400);
         }, 400);
 
         if (gameState.lives <= 0) {
           gameState.gameOver = true;
           cancelAnimationFrame(gameState.animationFrameId);
           clearTimeout(gameState.timerId);
-          let gameOverAudio = new Audio('./utils/sounds/game-over.mp3');
-          let failAudio = new Audio('./utils/sounds/fail-sound.mp3');
+          let gameOverAudio = new Audio("./utils/sounds/game-over.mp3");
+          let failAudio = new Audio("./utils/sounds/fail-sound.mp3");
           if (gameState.currentLevel == 5) {
-            let bossLaughingAudio = new Audio('./utils/sounds/Boss-Laughing.mp3');
+            let bossLaughingAudio = new Audio(
+              "./utils/sounds/Boss-Laughing.mp3"
+            );
             bossLaughingAudio.play();
-            setTimeout(() => { gameOverAudio.play(); }, 2000);
+            setTimeout(() => {
+              gameOverAudio.play();
+            }, 2000);
           } else {
             failAudio.play();
-            setTimeout(() => { gameOverAudio.play(); }, 3000);
+            setTimeout(() => {
+              gameOverAudio.play();
+            }, 3000);
           }
           DOM.resumeBtn.style.display = "none";
-          showPopup("GAME OVER!", `You've been shot down! Your Final Score: ${gameState.score}`);
+          showPopup(
+            "GAME OVER!",
+            `You've been shot down! Your Final Score: ${gameState.score}`
+          );
           return;
         }
       }
@@ -334,7 +409,8 @@ export function startEnemyShooting() {
 
 export function stopEnemyShooting() {
   if (gameState.enemyShootTimer) clearTimeout(gameState.enemyShootTimer);
-  for (let i = 0; i < gameState.squares.length; i++) gameState.squares[i].classList.remove("laser");
+  for (let i = 0; i < gameState.squares.length; i++)
+    gameState.squares[i].classList.remove("laser");
 }
 
 export function updateTimer() {
@@ -346,7 +422,7 @@ export function updateTimer() {
     gameState.gameOver = true;
     cancelAnimationFrame(gameState.animationFrameId);
     clearTimeout(gameState.timerId);
-    let timeUpAudio = new Audio('./utils/sounds/times-up.mp3');
+    let timeUpAudio = new Audio("./utils/sounds/times-up.mp3");
     timeUpAudio.volume = 0.5;
     timeUpAudio.play();
 

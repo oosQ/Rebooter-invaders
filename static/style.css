@@ -6,7 +6,8 @@
     box-sizing: border-box;
 }
 
-html,body {
+html,
+body {
     height: 100%;
     width: 100%;
     overflow: hidden;
@@ -44,7 +45,7 @@ body {
     padding: 0.5rem 1rem;
     border-radius: 12px;
     border: 1px solid rgba(99, 102, 241, 0.2);
-        transition: all 0.3s ease;
+    transition: all 0.3s ease;
 }
 
 .stat-item:hover {
@@ -86,12 +87,15 @@ body {
 .fa-trophy.stat-icon {
     color: #fbbf24;
 }
+
 .fa-ranking-star.stat-icon {
     color: #34d399;
 }
+
 .fa-clock.stat-icon {
     color: #60a5fa;
 }
+
 .fa-gauge-high.stat-icon {
     color: #a78bfa;
 }
@@ -170,55 +174,45 @@ body {
     filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.9));
 }
 
-/* Explosion Effect */
-.boom {
-    animation: explosion 0.3s ease-out;
+/* Boom/Explosion Effect */
+.grid div.boom {
+    background: none !important;
+    position: relative;
+    z-index: 10;
+    animation: explosionEffect 0.4s ease-out;
 }
 
-.boom::after {
-    content: "";
+.grid div.boom::before {
+    content: '';
     position: absolute;
-    top: -30%;
-    left: -30%;
-    right: -30%;
-    bottom: -30%;
-    background: radial-gradient(circle, rgba(251, 191, 36, 0.8) 0%, rgba(239, 68, 68, 0.6) 40%, transparent 70%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 150%;
+    height: 150%;
+    background: radial-gradient(rgba(255, 165, 0, 1) 0%,transparent 80%);
     border-radius: 50%;
-    animation: shockwave 0.4s ease-out;
+    animation: explosionPulse 0.1s ease-out;
 }
 
-@keyframes explosion {
+@keyframes explosionEffect {
     0% {
-        transform: scale(0.5);
-        opacity: 1;
-        filter: brightness(2);
+        filter: brightness(3) saturate(3);
+        box-shadow: 0 0 10px 10px rgba(255, 165, 0, 0.3);
     }
 
     50% {
-        transform: scale(1.3);
-        opacity: 0.8;
+        filter: brightness(2) saturate(2);
+        box-shadow: 0 0 30px 10px rgba(255, 69, 0, 0.3);
     }
 
     100% {
-        transform: scale(1);
-        opacity: 0.6;
-        filter: brightness(1);
+        filter: brightness(0) saturate(0);
+        box-shadow: 0 0 10px 5px rgba(139, 0, 0, 0.3);
     }
 }
 
-@keyframes shockwave {
-    0% {
-        transform: scale(0);
-        opacity: 1;
-    }
-
-    100% {
-        transform: scale(1.5);
-        opacity: 0;
-    }
-}
-
-/* Modern Game Popup */
+/*  Modern Game Popup */
 .game-popup {
     position: fixed;
     top: 50%;
@@ -237,6 +231,23 @@ body {
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 100px rgba(99, 102, 241, 0.2);
     display: none;
     opacity: 0;
+}
+
+.game-popup::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.game-popup.show::before {
+    opacity: 1;
 }
 
 .game-popup.show {
