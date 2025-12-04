@@ -6,8 +6,7 @@
     box-sizing: border-box;
 }
 
-html,
-body {
+html,body {
     height: 100%;
     width: 100%;
     overflow: hidden;
@@ -48,12 +47,6 @@ body {
     transition: all 0.3s ease;
 }
 
-.stat-item:hover {
-    background: rgba(99, 102, 241, 0.15);
-    border-color: rgba(99, 102, 241, 0.4);
-    transform: translateY(-2px);
-}
-
 .stat-icon {
     font-size: 1.5rem;
     color: #6366f1;
@@ -61,7 +54,6 @@ body {
 
 .lives-icon {
     color: #ef4444;
-    filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.6));
 }
 
 .stat-content {
@@ -87,15 +79,12 @@ body {
 .fa-trophy.stat-icon {
     color: #fbbf24;
 }
-
 .fa-ranking-star.stat-icon {
     color: #34d399;
 }
-
 .fa-clock.stat-icon {
     color: #60a5fa;
 }
-
 .fa-gauge-high.stat-icon {
     color: #a78bfa;
 }
@@ -115,7 +104,6 @@ body {
 .grid {
     width: min(85vmin, 650px);
     height: min(85vmin, 650px);
-    max-height: calc(100vh - 120px);
     aspect-ratio: 1 / 1;
     border: 2px solid rgba(99, 102, 241, 0.4);
     border-radius: 24px;
@@ -139,26 +127,22 @@ body {
 .grid div.invader {
     background: url("../images/enemie.png") center / 120% no-repeat;
     position: relative;
-    filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.7));
 }
 
 .grid div.shooter-invader {
     background: url("../images/enemieShooter.png") center / 120% no-repeat;
     position: relative;
-    filter: drop-shadow(0 0 12px rgba(251, 191, 36, 0.7));
 }
 
 .grid div.boss {
     background: url("../images/boss.png") center / 150% no-repeat;
     position: relative;
-    filter: drop-shadow(0 0 20px rgba(239, 68, 68, 0.9));
     z-index: 5;
 }
 
 .grid div.shooter {
     height: 60px;
     width: 70px;
-    filter: drop-shadow(0 0 15px rgba(99, 102, 241, 0.8));
 }
 
 .shooter {
@@ -171,45 +155,6 @@ body {
 
 .enemy-laser {
     background: url("../images/enime-shoot.png") center / contain no-repeat;
-    filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.9));
-}
-
-/* Boom/Explosion Effect */
-.grid div.boom {
-    background: none !important;
-    position: relative;
-    z-index: 10;
-    animation: explosionEffect 0.4s ease-out;
-}
-
-.grid div.boom::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 150%;
-    height: 150%;
-    background: radial-gradient(rgba(255, 165, 0, 1) 0%,transparent 80%);
-    border-radius: 50%;
-    animation: explosionPulse 0.1s ease-out;
-}
-
-@keyframes explosionEffect {
-    0% {
-        filter: brightness(3) saturate(3);
-        box-shadow: 0 0 10px 10px rgba(255, 165, 0, 0.3);
-    }
-
-    50% {
-        filter: brightness(2) saturate(2);
-        box-shadow: 0 0 30px 10px rgba(255, 69, 0, 0.3);
-    }
-
-    100% {
-        filter: brightness(0) saturate(0);
-        box-shadow: 0 0 10px 5px rgba(139, 0, 0, 0.3);
-    }
 }
 
 /*  Modern Game Popup */
@@ -231,23 +176,6 @@ body {
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 100px rgba(99, 102, 241, 0.2);
     display: none;
     opacity: 0;
-}
-
-.game-popup::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.85);
-    z-index: -1;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.game-popup.show::before {
-    opacity: 1;
 }
 
 .game-popup.show {
