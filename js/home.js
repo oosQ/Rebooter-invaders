@@ -1,44 +1,31 @@
-const startGameBtn = document.getElementById("startGameBtn");
-const leaderboardBtn = document.getElementById("leaderboardBtn");
-const leaderboardDialog = document.getElementById("leaderboardDialog");
-const closeLeaderboardBtn = document.getElementById("closeLeaderboardBtn");
-const aboutBtn = document.getElementById("aboutBtn");
-const closeAboutBtn = document.getElementById("closeAboutBtn");
-const aboutDialog = document.getElementById("aboutDialog");
+import { DOM } from "./config.js";
 
-startGameBtn.addEventListener("click", startGame);
-leaderboardBtn.addEventListener("click", showLeaderboard);
-aboutBtn.addEventListener("click", showAbout);
-closeAboutBtn.addEventListener("click", closeAbout);
-closeLeaderboardBtn.addEventListener("click", closeLeaderboard);
+export function showLeaderboard() {
+  DOM.leaderboardDialog.style.display = "flex";
 
+  // [ Fetch scoreboard ]
+  fetch("/scoreboard")
+    .then((response) => response.json())
+    .then((data) => {
+      const leaderboardList = document.getElementById("leaderboardList");
 
-leaderboardDialog.addEventListener("click", function (e) {
-  if (e.target === leaderboardDialog) closeLeaderboard();
-});
+      // [ Sort data descending ]
+      data.sort((a, b) => b.score - a.score);
+      leaderboardList.innerHTML =
+        data.length === 0 ? "<p>No scores recorded yet!</p>" : "";
 
-aboutDialog.addEventListener("click", function (e) {
-  if (e.target === aboutDialog) closeAbout();
-});
+      // [ Show Data ]
+      data.forEach((entry, index) => {
+        const entryDiv = document.createElement("div");
+        entryDiv.className = "leaderboard-entry";
+        entryDiv.innerHTML = `<span class="rank">${index + 1}</span> <span class="name">${entry.name}</span> - <span class="score">${entry.score}</span> pts - <span class="time">${entry.timeTaken}</span>`;
+        leaderboardList.appendChild(entryDiv);
+      });
 
-function closeLeaderboard() {
-  leaderboardDialog.style.display = "none";
-}
-
-function closeAbout() {
-  aboutDialog.style.display = "none";
-}
-
-function startGame() {
-    document.body.style.transition = 'opacity 0.5s ease-out';
-    document.body.style.opacity = 0;
-    setTimeout(() => {window.location.href = "index.html";}, 500);
-}
-
-function showLeaderboard() {
-  leaderboardDialog.style.display = "flex";
-}
-
-function showAbout() {
-  aboutDialog.style.display = "flex";
+      // [ Handle case with no entries ]
+    }).catch((error) => {
+      console.error("Error fetching scoreboard:", error);
+      const leaderboardList = document.getElementById("leaderboardList");
+      leaderboardList.innerHTML ="<p>Error loading scores. Please try again.</p>";
+    });
 }
