@@ -4,7 +4,6 @@ A browser-based Space Invaders game with 5 levels, a story mode, a final boss, a
 
 ![Gameplay](images/game.png)
 
----
 
 ## Features
 
