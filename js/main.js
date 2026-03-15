@@ -1,14 +1,56 @@
-import { 
-    DOM, gameStates, showPopup, nextLevel, updateTimer, startGame, endGame, resumeGame, restartGame, calculateFPS, addSound,
-    levels
-} from "./config.js";
+import { DOM, gameStates, levels, updateTimer, calculateFPS, } from "./config.js";
+import { addSound, hideStoryPopup, showStoryPopup, storyContent, } from "./story.js";
+import { endGame, resetWhenRichedBottom, eventListeners } from "./controls.js";
+import { scoreBoardSetup } from "./scoreboard.js";
 
-// Create cells as div elements and append to the grid (parent)
-for (let i = 0; i < gameStates.width * gameStates.width; i++) {
-    const square = document.createElement("div");
-    DOM.grid.appendChild(square);
+// Declare squares variable
+export let squares = [];
+
+// Initialize grid squares
+export function initializeGrid() {
+    // Create cells as div elements and append to the grid (parent)
+    for (let i = 0; i < gameStates.width * gameStates.width; i++) {
+        const square = document.createElement("div");
+        DOM.grid.appendChild(square);
+    }
+    squares = Array.from(document.querySelectorAll(".grid div"));
 }
-export const squares = Array.from(document.querySelectorAll(".grid div"));
+
+// [ Level management ]
+export function nextLevel() {
+    gameStates.level++;
+    addSound("nextlevel");
+    manageInvaders("remove");
+    gameStates.direction = 1;
+    gameStates.goingRight = true;
+    initializeLevel(gameStates.level);
+    manageInvaders("add");
+}
+
+export function initializeLevel(level) {
+    const currentLvl = levels[level];
+    gameStates.alienInvaders = [];
+    gameStates.shooterInvaders = [];
+    gameStates.aliensRemoved = [];
+    gameStates.shooterRemoved = [];
+    gameStates.alienInvaders.push(...currentLvl.invaders);
+    if (currentLvl.shooterInvaders) gameStates.shooterInvaders.push(...currentLvl.shooterInvaders);
+    if (currentLvl.bossPosition !== undefined) {
+        gameStates.bossPosition = currentLvl.bossPosition;
+    } else {
+        gameStates.bossPosition = -1;
+    }
+
+    gameStates.invaderMoveInterval = currentLvl.movementSpeed;
+
+    if (DOM.levelDisplay) DOM.levelDisplay.textContent = level;
+
+    if (level > 1) {
+        gameStates.gameTime += currentLvl.timeBonus;
+        if (DOM.timerDisplay)
+            DOM.timerDisplay.textContent = gameStates.remainingTime;
+    }
+}
 
 // Remove/add class invaders
 export function manageInvaders(condition) {
@@ -43,7 +85,7 @@ function shootLaser() {
     if (gameStates.isPaused || gameStates.gameOver) return;
 
     const currentTime = performance.now();
-    if (currentTime - gameStates.lastShotTime < 350) return;
+    if (currentTime - gameStates.lastShotTime < 50) return;
     gameStates.lastShotTime = currentTime;
     let currentLaserIndex = gameStates.currentShooterIndex;
     addSound("fire");
@@ -55,10 +97,11 @@ function shootLaser() {
         if (currentLaserIndex < 0) return;
 
         squares[currentLaserIndex].classList.add("laser");
-
         if (squares[currentLaserIndex].classList.contains("invader") || squares[currentLaserIndex].classList.contains("shooter-invader") || squares[currentLaserIndex].classList.contains("boss")) {
             addSound("hit");
             squares[currentLaserIndex].classList.remove("laser");
+
+            // Boss hit
             if (squares[currentLaserIndex].classList.contains("boss")) {
                 gameStates.bossHealth--;
                 if (gameStates.bossHealth <= 0) {
@@ -78,14 +121,26 @@ function shootLaser() {
 
                 const alienRemoved = gameStates.alienInvaders.indexOf(currentLaserIndex);
                 if (alienRemoved !== -1) gameStates.invadersRemoved.push(alienRemoved);
+
                 gameStates.result += 10 * gameStates.level;
             }
             DOM.result.innerHTML = gameStates.result;
+            developmentStage();
         } else {
             requestAnimationFrame(moveLaser);
         }
     }
     requestAnimationFrame(moveLaser);
+}
+
+function developmentStage() {
+    if (!gameStates.storyMode || gameStates.storyStage !== 1) return;
+
+    if (gameStates.result >= storyContent.development.triggerScore) {
+        gameStates.storyStage = 2;
+        addSound("development");
+        showStoryPopup(storyContent.development);
+    }
 }
 
 // Invaders shoot back
@@ -106,27 +161,44 @@ function invadersShoot(timestamp) {
             function moveEnemyLaser() {
                 if (gameStates.gameOver || gameStates.isPaused) return;
                 if (squares[currentEnemyLaserIndex]) squares[currentEnemyLaserIndex].classList.remove("enemy-laser");
+
                 currentEnemyLaserIndex += gameStates.width;
                 if (currentEnemyLaserIndex >= squares.length) return;
                 squares[currentEnemyLaserIndex].classList.add("enemy-laser");
 
                 if (squares[currentEnemyLaserIndex].classList.contains("shooter")) {
                     squares[currentEnemyLaserIndex].classList.remove("enemy-laser");
-                    
+
                     if (gameStates.lives > 0) {
                         addSound("hit");
                         gameStates.lives--;
                         DOM.livesDisplay.innerHTML = gameStates.lives;
                     }
 
+                    // [ Check for game over ]
                     if (gameStates.lives <= 0) {
                         gameStates.gameOver = true;
                         cancelAnimationFrame(gameStates.animationFrameId);
-                        addSound("gameover");
-                        showPopup("Game Over", `You lost! Final Score: ${gameStates.result}`);
+                        // [ Check for story mode ]
+                        if (gameStates.storyMode) {
+                            addSound("mission-failed");
+                            if (gameStates.level === 5) setTimeout(() => addSound("boss-laughing"), 2000);
+                            showStoryPopup(storyContent.defeatConclusion);
+                            DOM.storyContinueBtn.onclick = () => {
+                                hideStoryPopup();
+                                let name = prompt("Enter your name for the leaderboard:");
+                                scoreBoardSetup(name, gameStates.result, DOM.timerDisplay.innerHTML);
+                            };
+                        } else {
+                            addSound("gameover");
+                            if (gameStates.level === 5) setTimeout(() => addSound("boss-laughing"), 2000);
+                            let name = prompt("Enter your name for the leaderboard:");
+                            scoreBoardSetup(name, gameStates.result, DOM.timerDisplay.innerHTML);
+                        }
                         endGame();
                         return;
                     }
+
                 } else {
                     requestAnimationFrame(moveEnemyLaser);
                 }
@@ -139,7 +211,7 @@ function invadersShoot(timestamp) {
 
 // Move the invaders
 export function moveInvaders(timestamp) {
-    if (gameStates.gameOver) return;
+    if (gameStates.gameOver || gameStates.isPaused) return;
     if (!gameStates.lastInvaderMoveTime) gameStates.lastInvaderMoveTime = timestamp;
     const elapsed = timestamp - gameStates.lastInvaderMoveTime;
     calculateFPS();
@@ -178,7 +250,7 @@ export function moveInvaders(timestamp) {
             }
         }
 
-        // Boss Movement 
+        // Boss Movement
         if (gameStates.bossPosition !== -1) {
             const bossLeftCorner = gameStates.bossPosition % gameStates.width === 0;
             const bossRightCorner = gameStates.bossPosition % gameStates.width === gameStates.width - 1;
@@ -195,73 +267,41 @@ export function moveInvaders(timestamp) {
         manageInvaders("add");
         gameStates.lastInvaderMoveTime = timestamp;
 
-        // Check if invaders reach the shooter or bottom
+        // [ Check if invaders reach the shooter or bottom ]
         const shooterRow = Math.floor(gameStates.currentShooterIndex / gameStates.width);
         for (let i = 0; i < gameStates.alienInvaders.length; i++) {
             const invaderRow = Math.floor(gameStates.alienInvaders[i] / gameStates.width);
-            if (gameStates.alienInvaders[i] === gameStates.currentShooterIndex || invaderRow >= shooterRow) {
-                gameStates.lives -= 1;
-                DOM.livesDisplay.innerHTML = gameStates.lives;
-                
-                // Remove all invaders from the grid
-                manageInvaders("remove");
-                
-                // Reset to static positions for current level
-                gameStates.alienInvaders = [...levels[gameStates.level].staticpositions];
-                if (levels[gameStates.level].shooterInvaders) {
-                    gameStates.shooterInvaders = [...levels[gameStates.level].shooterInvaders];
-                } else {
-                    gameStates.shooterInvaders = [];
-                }
-                
-                // Reset removed arrays
-                gameStates.aliensRemoved = [];
-                gameStates.shooterRemoved = [];
-                
-                // Reset boss position if level 5
-                if (gameStates.level === 5) {
-                    gameStates.bossPosition = levels[gameStates.level].bossPosition || -1;
-                    gameStates.bossHealth = 3;
-                }
-                
-                // Reset movement directions and states
-                gameStates.direction = 1;
-                gameStates.goingRight = true;
-                gameStates.shooterDirection = 1;
-                gameStates.shooterGoingRight = true;
-                gameStates.bossDirection = 1;
-                gameStates.bossGoingRight = true;
-                
-                // Reset timing to current timestamp
-                gameStates.lastInvaderMoveTime = timestamp;
-                gameStates.lastInvaderShootTime = timestamp;
-                
-                // Add invaders back to the grid
-                manageInvaders("add");
-                moveInvaders(timestamp);
-                if (gameStates.lives <= 0) {
-                    gameStates.gameOver = true;
-                    cancelAnimationFrame(gameStates.animationFrameId);
-                    addSound("gameover");
-                    showPopup("Game Over", `You lost! Final Score: ${gameStates.result}`);
-                    endGame();
-                    return;
-                }
-                return;
-            }
+            if (gameStates.alienInvaders[i] === gameStates.currentShooterIndex || invaderRow >= shooterRow) resetWhenRichedBottom();
         }
+
+        // [ Check for level completion ]
         if (gameStates.alienInvaders.length === 0 && gameStates.shooterInvaders.length === 0 && gameStates.bossPosition === -1) {
             if (gameStates.level < gameStates.maxLevels) {
+                addSound("next-level");
                 nextLevel();
             } else {
+                // [ Win condition ]
                 gameStates.gameOver = true;
                 cancelAnimationFrame(gameStates.animationFrameId);
                 clearTimeout(gameStates.timerId);
-                addSound("victory");
-                showPopup("CONGRATULATIONS!",`You've completed all ${gameStates.maxLevels} levels! Final Score: ${gameStates.result}`);
+                if (gameStates.storyMode) {
+                    addSound("mission-complete");
+                    showStoryPopup(storyContent.victoryConclusion);
+                    DOM.storyContinueBtn.onclick = () => {
+                        hideStoryPopup();
+                        addSound("victory");
+                        let name = prompt("Enter your name for the leaderboard:");
+                        scoreBoardSetup(name, gameStates.result, DOM.timerDisplay.innerHTML);
+                    };
+                } else {
+                    addSound("victory");
+                    let name = prompt("Enter your name for the leaderboard:");
+                    scoreBoardSetup(name, gameStates.result, DOM.timerDisplay.innerHTML);
+                }
                 return;
             }
         }
+
     }
 
     invadersShoot(timestamp);
@@ -269,13 +309,3 @@ export function moveInvaders(timestamp) {
     updateTimer();
     if (!gameStates.isPaused && !gameStates.gameOver) gameStates.animationFrameId = requestAnimationFrame(moveInvaders);
 }
-
-// Event listeners for popup buttons
-DOM.resumeBtn.addEventListener("click", resumeGame);
-DOM.restartBtn.addEventListener("click", restartGame);
-DOM.backToMenuBtn.addEventListener("click", () => { window.location.href = "home.html"; });
-
-// Global key listener for R key (restart)
-document.addEventListener("keydown", (e) => { if (e.code === "KeyR") restartGame(); });
-
-startGame();
