@@ -4,74 +4,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rebooter01 - Invaders</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="./static/style.css">
+    <title>Space Invaders - Home</title>
+    <link rel="stylesheet" href="./static/home.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
 </head>
 
 <body>
-    <!-- Game Status Bar -->
-    <nav class="navbar">
-        <div class="stat-item">
-            <i class="fa-solid fa-trophy stat-icon"></i>
-            <div class="stat-content">
-                <span class="stat-label">Score</span>
-                <span class="stat-value result">0</span>
+    <!-- Home Page Menu -->
+    <div class="home-container">
+        <div class="menu-container">
+            <h1 class="welcome-title">Rebooter01 - Invaders</h1>
+            <p class="welcome-subtitle">Prove your skills VS the competitors</p>
+            <div class="menu-dialog">
+                <button id="startGameBtn" class="menu-btn"> START GAME</button>
+                <button id="leaderboardBtn" class="menu-btn"> <i class="fa-solid fa-trophy"></i> LEADERBOARD</button>
+                <button id="aboutBtn" class="menu-btn"> <i class="fa-solid fa-circle-info"></i> ABOUT</button>
             </div>
-        </div>
-        
-        <div class="stat-item">
-            <i class="fa-solid fa-clock stat-icon"></i>
-            <div class="stat-content">
-                <span class="stat-label">Time</span>
-                <span class="stat-value timer">60</span>
-            </div>
-        </div>
-        
-        <div class="stat-item">
-            <i class="fa-solid fa-ranking-star stat-icon"></i>
-            <div class="stat-content">
-                <span class="stat-label">Level</span>
-                <span class="stat-value level">1</span>
-            </div>
-        </div>
-        
-        <div class="stat-item">
-            <i class="fa-solid fa-heart stat-icon lives-icon"></i>
-            <div class="stat-content">
-                <span class="stat-label">Lives</span>
-                <span class="stat-value lives">3</span>
-            </div>
-        </div>
-        
-        <div class="stat-item">
-            <i class="fa-solid fa-gauge-high stat-icon"></i>
-            <div class="stat-content">
-                <span class="stat-label">FPS</span>
-                <span class="stat-value fps-display">0</span>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Grid Container -->
-    <div class="game-container">
-        <div class="grid"></div>
-    </div>
-
-    <!-- Pause Menu Pop-up -->
-    <div id="gamePopup" class="game-popup">
-        <div class="popup-content">
-            <h2 id="popupTitle">Game Paused</h2>
-            <p id="popupMessage"></p>
-            <div class="buttons">
-                <button id="resumeBtn" class="back-menu-btn"><i class="fa-solid fa-play"></i>Resume</button>
-                <button id="restartBtn" class="back-menu-btn"><i class="fa-solid fa-rotate"></i>Restart</button>
-            </div>
-            <button id="backToMenuBtn" class="back-menu-btn"><i class="fa-solid fa-home"></i>Main Menu</button>
         </div>
     </div>
 
-    <script type="module" src="./js/main.js"></script>
+    <!-- Leaderboard Dialog -->
+    <div id="leaderboardDialog" class="dialog-overlay" style="display: none;">
+        <div class="dialog-content">
+            <h2> LEADERBOARD</h2>
+            <div id="leaderboardList" class="leaderboard-list">
+                <p>No scores recorded yet!</p>
+            </div>
+            <button id="closeLeaderboardBtn" class="dialog-btn">BACK TO MENU</button>
+        </div>
+    </div>
+
+    <!-- About Dialog -->
+    <div id="aboutDialog" class="dialog-overlay" style="display: none;">
+        <div class="dialog-content">
+            <h2>About the Game</h2>
+            <div class="about-content">
+                <h3>How to Play ?</h3>
+                <ul>
+                    <li>Use <strong> ARROW KEYS </strong> to move your charachter</li>
+                    <li>Press <strong> SPACEBAR </strong> to shoot GUUUN</li>
+                    <li>Press <strong> P or ESC </strong> to pause game</li>
+                    <li>Press <strong> R </strong> to restart game</li>
+                    <li>Face the final boss in Level 5 & win the GAMEEE!</li>
+                </ul>
+
+                <div class="game-credits">
+                    <h3>👨‍💻 Made by Reboot01 Talent</h3>
+                </div>
+            </div>
+            <button id="closeAboutBtn" class="dialog-btn">BACK TO MENU</button>
+        </div>
+    </div>
+
+    <script src="./js/home.js" type="module"></script>
+    <script type="module">
+        import { eventListeners } from './js/controls.js';
+        // Initialize home page event listeners after all modules are loaded
+        eventListeners("index");
+    </script>
 </body>
 
 </html>
