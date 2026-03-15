@@ -6,7 +6,8 @@
     box-sizing: border-box;
 }
 
-html,body {
+html,
+body {
     height: 100%;
     width: 100%;
     overflow: hidden;
@@ -79,12 +80,15 @@ body {
 .fa-trophy.stat-icon {
     color: #fbbf24;
 }
+
 .fa-ranking-star.stat-icon {
     color: #34d399;
 }
+
 .fa-clock.stat-icon {
     color: #60a5fa;
 }
+
 .fa-gauge-high.stat-icon {
     color: #a78bfa;
 }
@@ -104,6 +108,7 @@ body {
 .grid {
     width: min(85vmin, 650px);
     height: min(85vmin, 650px);
+    max-height: calc(100vh - 120px);
     aspect-ratio: 1 / 1;
     border: 2px solid rgba(99, 102, 241, 0.4);
     border-radius: 24px;
@@ -157,43 +162,93 @@ body {
     background: url("../images/enime-shoot.png") center / contain no-repeat;
 }
 
+
 /*  Modern Game Popup */
 .game-popup {
     position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0.9);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 1000;
+}
+
+.game-popup.show {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.9);
+    animation: overlayFadeIn 0.3s ease-out;
+}
+
+@keyframes overlayFadeIn {
+    from {
+        background: rgba(0, 0, 0, 0);
+    }
+
+    to {
+        background: rgba(0, 0, 0, 1);
+    }
+}
+
+.popup-content {
     background: rgba(10, 14, 39, 0.98);
     backdrop-filter: blur(20px);
     color: white;
     padding: 3rem;
     border-radius: 24px;
     text-align: center;
-    z-index: 1000;
     min-width: 500px;
-    max-width: 90vw;
+    max-width: 50vw;
     border: 2px solid rgba(99, 102, 241, 0.3);
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 100px rgba(99, 102, 241, 0.2);
-    display: none;
-    opacity: 0;
+    animation: popupShow 0.3s ease-out;
 }
 
-.game-popup.show {
-    display: block;
-    animation: popupShow 0.3s ease-out forwards;
+.game-popup.show .popup-content {
+    animation: popupShow 0.3s ease-out;
 }
 
 @keyframes popupShow {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
     to {
         opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
+        transform: scale(1);
     }
 }
 
-.popup-content {
+@keyframes storySlideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-100%);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.popup-content>div {
     display: flex;
-    flex-direction: column;
     gap: 1.5rem;
+}
+
+/* Story popup specific animation */
+#storyPopup .popup-content {
+    animation: storySlideDown 1.0s ease-out;
+}
+
+#storyPopup.show .popup-content {
+    animation: storySlideDown 1.0s ease-out;
 }
 
 .game-popup h2 {
@@ -205,10 +260,33 @@ body {
 }
 
 .game-popup p {
-    margin: 0;
+    margin: auto;
     color: #cbd5e1;
     font-size: 1.2rem;
     line-height: 1.6;
+}
+
+/* Typing effect for story popup */
+#storyPopup #storyMessage {
+    display: inline-block;
+    max-width: 100%;
+    margin: revert;
+    animation: typing 5.5s steps(400) 0.6s forwards;
+    opacity: 0;
+    overflow: hidden;
+    max-height: 0;
+}
+
+@keyframes typing {
+    from {
+        max-height: 0;
+        opacity: 1;
+    }
+
+    to {
+        max-height: 1000px;
+        opacity: 1;
+    }
 }
 
 .buttons {
@@ -216,6 +294,20 @@ body {
     gap: 1rem;
     justify-content: space-between;
     margin-top: 1rem;
+}
+
+/* Normal popup buttons - two buttons in same line */
+#gamePopup .buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+/* Story mode popup buttons - stack vertically */
+#storyModePopup .buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 }
 
 .back-menu-btn {
@@ -291,4 +383,157 @@ body {
         font-size: 2rem;
     }
 
+}
+
+/* Scoreboard Styles */
+.scoreboard-content {
+    min-width: 650px;
+    max-width: 800px;
+    background: rgba(10, 14, 39, 0.98) !important;
+    backdrop-filter: blur(20px);
+}
+
+.scoreboard-content h2 {
+    color: #fff;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.percentile-message {
+    font-size: 1.2rem;
+    color: #fbbf24;
+    font-weight: 600;
+    margin: 1rem 0;
+    text-align: center;
+    padding: 0.75rem;
+    background: rgba(251, 191, 36, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.scoreboard-container {
+    margin: 1.5rem 0;
+    overflow-x: auto;
+    border-radius: 8px;
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.scoreboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1rem;
+}
+
+.scoreboard-table thead {
+    background: rgba(99, 102, 241, 0.2);
+}
+
+.scoreboard-table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #6366f1;
+    font-size: 0.9rem;
+}
+
+.scoreboard-table td {
+    padding: 0.875rem 1rem;
+    border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+    color: #e2e8f0;
+    font-size: 1rem;
+}
+
+.scoreboard-table tbody tr {
+    transition: background 0.2s ease;
+}
+
+.scoreboard-table tbody tr:hover {
+    background: rgba(99, 102, 241, 0.1);
+}
+
+.scoreboard-table tbody tr.highlight {
+    background: rgba(251, 191, 36, 0.2);
+    border: 2px solid rgba(251, 191, 36, 0.5);
+}
+
+.scoreboard-table .rank-cell {
+    font-weight: 700;
+    color: #fbbf24;
+}
+
+.scoreboard-table .rank-1 {
+    color: #ffd700;
+    font-size: 1.1rem;
+}
+
+.scoreboard-table .rank-2 {
+    color: #c0c0c0;
+}
+
+.scoreboard-table .rank-3 {
+    color: #cd7f32;
+}
+
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+    margin: 1.5rem 0;
+}
+
+.page-btn {
+    background: rgba(99, 102, 241, 0.2);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    color: #fff;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: "Pixelify Sans", sans-serif;
+}
+
+.page-btn:hover:not(:disabled) {
+    background: rgba(99, 102, 241, 0.4);
+    transform: scale(1.05);
+}
+
+.page-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+#pageInfo {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #94a3b8;
+}
+
+.scoreboard-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .scoreboard-content {
+        min-width: 90vw;
+    }
+
+    .scoreboard-table {
+        font-size: 0.85rem;
+    }
+
+    .scoreboard-table th,
+    .scoreboard-table td {
+        padding: 0.5rem;
+    }
+
+    .percentile-message {
+        font-size: 1rem;
+    }
 }
