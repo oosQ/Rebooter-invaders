@@ -1,8 +1,10 @@
 import {
     storyContent,
     showStoryPopup,
+    hideStoryPopup,
     addSound,
 } from "./story.js";
+import { requestGameToken, scoreBoardSetup } from "./scoreboard.js";
 
 export const DOM = {
     // [ Game Elements ]
@@ -188,10 +190,22 @@ export function updateTimer() {
             addSound("mission-failed");
             if (gameStates.level === 5) addSound("boss-laughing");
             showStoryPopup(storyContent.defeatConclusion);
+            DOM.storyContinueBtn.onclick = async () => {
+                hideStoryPopup();
+                let name = prompt("Enter your name for the leaderboard:");
+                const timeTaken = gameStates.gameTime - gameStates.remainingTime;
+                const token = await requestGameToken(gameStates.result, timeTaken);
+                scoreBoardSetup(name, gameStates.result, timeTaken, token);
+            };
         } else {
             addSound("timeup");
             if (gameStates.level === 5) addSound("boss-laughing");
-            showPopup("show", "Game Over", `Time's up! Final Score: ${gameStates.result}`, false, "lose");
+            (async () => {
+                let name = prompt("Enter your name for the leaderboard:");
+                const timeTaken = gameStates.gameTime - gameStates.remainingTime;
+                const token = await requestGameToken(gameStates.result, timeTaken);
+                scoreBoardSetup(name, gameStates.result, timeTaken, token);
+            })();
         }
 
         endGame();

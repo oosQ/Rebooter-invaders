@@ -237,8 +237,11 @@ body {
     }
 }
 
-.popup-content>div {
+/* Specific layout for game and story popups only */
+#gamePopup .popup-content>div,
+#storyPopup .popup-content>div {
     display: flex;
+    flex-direction: column;
     gap: 1.5rem;
 }
 

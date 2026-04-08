@@ -1,7 +1,7 @@
 import { DOM, gameStates, levels, updateTimer, calculateFPS, } from "./config.js";
 import { addSound, hideStoryPopup, showStoryPopup, storyContent, } from "./story.js";
 import { endGame,resetWhenRichedBottom} from "./controls.js";
-import { scoreBoardSetup } from "./scoreboard.js";
+import { scoreBoardSetup, requestGameToken } from "./scoreboard.js";
 
 // Declare squares variable
 export let squares = [];
@@ -184,18 +184,22 @@ function invadersShoot(timestamp) {
               addSound("mission-failed");
               if (gameStates.level === 5) setTimeout(() => addSound("boss-laughing"), 2000);
               showStoryPopup(storyContent.defeatConclusion);
-              DOM.storyContinueBtn.onclick = () => {
+              DOM.storyContinueBtn.onclick = async () => {
                 hideStoryPopup();
                 let name = prompt("Enter your name for the leaderboard:");
                 const timeTaken = gameStates.gameTime - gameStates.remainingTime;
-                scoreBoardSetup(name, gameStates.result, timeTaken);
+                const token = await requestGameToken(gameStates.result, timeTaken);
+                scoreBoardSetup(name, gameStates.result, timeTaken, token);
               };
             } else {
               addSound("gameover");
               if (gameStates.level === 5) setTimeout(() => addSound("boss-laughing"), 2000);
-              let name = prompt("Enter your name for the leaderboard:");
-              const timeTaken = gameStates.gameTime - gameStates.remainingTime;
-              scoreBoardSetup(name, gameStates.result, timeTaken);
+              (async () => {
+                let name = prompt("Enter your name for the leaderboard:");
+                const timeTaken = gameStates.gameTime - gameStates.remainingTime;
+                const token = await requestGameToken(gameStates.result, timeTaken);
+                scoreBoardSetup(name, gameStates.result, timeTaken, token);
+              })();
             }
             endGame();
             return;
@@ -289,18 +293,22 @@ export function moveInvaders(timestamp) {
         if (gameStates.storyMode) {
           addSound("mission-complete");
           showStoryPopup(storyContent.victoryConclusion);
-          DOM.storyContinueBtn.onclick = () => {
+          DOM.storyContinueBtn.onclick = async () => {
             hideStoryPopup();
             addSound("victory");
             let name = prompt("Enter your name for the leaderboard:");
             const timeTaken = gameStates.gameTime - gameStates.remainingTime;
-            scoreBoardSetup(name, gameStates.result, timeTaken);
+            const token = await requestGameToken(gameStates.result, timeTaken);
+            scoreBoardSetup(name, gameStates.result, timeTaken, token);
           };
         } else {
           addSound("victory");
-          let name = prompt("Enter your name for the leaderboard:");
-          const timeTaken = gameStates.gameTime - gameStates.remainingTime;
-          scoreBoardSetup(name, gameStates.result, timeTaken);
+          (async () => {
+            let name = prompt("Enter your name for the leaderboard:");
+            const timeTaken = gameStates.gameTime - gameStates.remainingTime;
+            const token = await requestGameToken(gameStates.result, timeTaken);
+            scoreBoardSetup(name, gameStates.result, timeTaken, token);
+          })();
         }
         return;
       }

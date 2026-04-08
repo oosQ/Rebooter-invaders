@@ -1,5 +1,36 @@
 
-export function scoreBoardSetup(name, score, timeTaken) {
+// [ Request game token from server when game ends ]
+export async function requestGameToken(score, timeTaken) {
+    // [ Convert seconds to MM:SS format ]
+    const totalSeconds = parseInt(timeTaken);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    const formattedTime = `${minutes}:${seconds.toString().padStart(2, "0")}`;
+    
+    try {
+        const response = await fetch("/game-end", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+                score: score, 
+                timeTaken: formattedTime,
+                gameOver: true 
+            }),
+        });
+        
+        if (!response.ok) {
+            throw new Error("Failed to generate game token");
+        }
+        
+        const data = await response.json();
+        return data.token;
+    } catch (error) {
+        console.error("Error requesting game token:", error);
+        return null;
+    }
+}
+
+export function scoreBoardSetup(name, score, timeTaken, gameToken) {
     // [ Sanitize & Validate name ]
     if (name == null || name.trim() === "") {
         // Generate random number for user name
@@ -12,11 +43,12 @@ export function scoreBoardSetup(name, score, timeTaken) {
         name = `user${randomNum}`;
     }
 
-    // [ Convert seconds to MM:SS format ]
-    const totalSeconds = parseInt(timeTaken);
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    const formattedTime = `${minutes}:${seconds.toString().padStart(2, "0")}`;
+    // [ Check if token is provided ]
+    if (!gameToken) {
+        console.error("No game token provided - score submission blocked");
+        alert("Error: Invalid game session. Score cannot be submitted.");
+        return;
+    }
 
     // [ First, fetch existing scores to check for duplicates ]
     fetch("/scoreboard")
@@ -30,20 +62,29 @@ export function scoreBoardSetup(name, score, timeTaken) {
                 name = `${name}${randomNum}`;
             }
 
-            // Now submit the score with the validated name
+            // Now submit the score with the token
             return fetch("/scoreboard", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name, score, timeTaken: formattedTime }),
+                body: JSON.stringify({ name, token: gameToken }),
             });
         })
-        .then((response) => response.json())
+        .then((response) => {
+            if (!response.ok) {
+                if (response.status === 401) {
+                    throw new Error("Invalid or expired game token");
+                }
+                throw new Error("Failed to submit score");
+            }
+            return response.json();
+        })
         .then((data) => {
             console.log("Score submitted successfully", data);
             showScoreboard(data, name);
         })
         .catch((error) => {
             console.error("Error submitting score:", error);
+            alert("Failed to submit score: " + error.message);
         });
 }
 

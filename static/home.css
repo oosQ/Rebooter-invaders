@@ -66,8 +66,181 @@ body {
     gap: 1.5rem;
     min-width: 350px;
 }
-.leaderboard-list p {
+
+/* About Dialog Styles */
+.about-content-wrapper {
+    min-width: 600px;
+    max-width: 700px;
+    background: rgba(10, 14, 39, 0.98) !important;
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(99, 102, 241, 0.3);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 100px rgba(99, 102, 241, 0.2);
+}
+
+.about-content-wrapper h2 {
+    color: #fff;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
     text-align: center;
+    text-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+}
+
+.about-content {
+    background: rgba(15, 23, 42, 0.8);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.about-content h3 {
+    color: #6366f1;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.about-content ul {
+    list-style: none;
+    padding: 0;
+}
+
+.about-content ul li {
+    margin: 0.75rem 0;
+    padding: 0.5rem;
+    background: rgba(99, 102, 241, 0.1);
+    border-radius: 8px;
+    border-left: 3px solid #6366f1;
+    transition: all 0.2s ease;
+}
+
+.about-content ul li:hover {
+    background: rgba(99, 102, 241, 0.2);
+    transform: translateX(5px);
+}
+
+.game-credits {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.game-credits h3 {
+    color: #fbbf24;
+    text-align: center;
+    font-size: 1.3rem;
+}
+
+/* Scoreboard Styles */
+.scoreboard-content {
+    min-width: 650px;
+    max-width: 800px;
+    background: rgba(10, 14, 39, 0.98) !important;
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(99, 102, 241, 0.3);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 100px rgba(99, 102, 241, 0.2);
+}
+
+.scoreboard-content h2 {
+    color: #fff;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.scoreboard-container {
+    margin: 1.5rem 0;
+    overflow-x: auto;
+    border-radius: 8px;
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.scoreboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1rem;
+}
+
+.scoreboard-table thead {
+    background: rgba(99, 102, 241, 0.2);
+}
+
+.scoreboard-table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #6366f1;
+    font-size: 0.9rem;
+}
+
+.scoreboard-table td {
+    padding: 0.875rem 1rem;
+    border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+    color: #e2e8f0;
+    font-size: 1rem;
+}
+
+.scoreboard-table tbody tr {
+    transition: background 0.2s ease;
+}
+
+.scoreboard-table tbody tr:hover {
+    background: rgba(99, 102, 241, 0.1);
+}
+
+.scoreboard-table .rank-cell {
+    font-weight: 700;
+    color: #fbbf24;
+}
+
+.scoreboard-table .rank-1 {
+    color: #ffd700;
+    font-size: 1.1rem;
+}
+
+.scoreboard-table .rank-2 {
+    color: #c0c0c0;
+}
+
+.scoreboard-table .rank-3 {
+    color: #cd7f32;
+}
+
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+    margin: 1.5rem 0;
+}
+
+.page-btn {
+    background: rgba(99, 102, 241, 0.2);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    color: #fff;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: "Pixelify Sans", sans-serif;
+}
+
+.page-btn:hover:not(:disabled) {
+    background: rgba(99, 102, 241, 0.4);
+    transform: scale(1.05);
+}
+
+.page-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+#homePageInfo {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #94a3b8;
 }
 
 .menu-btn , .dialog-btn {
@@ -109,15 +282,9 @@ body {
     text-align: center;
 }
 
-ul li {
-    margin: 0.5rem 0;
-    font-size: 1.1rem;
-    color: #ffffff;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-strong {
-    color: #ffdd57;
+.about-content strong {
+    color: #fbbf24;
+    font-weight: 700;
 }
 
 @keyframes dialogFadeIn {
@@ -166,5 +333,36 @@ strong {
         margin: 1rem;
         padding: 2rem;
         max-width: calc(100% - 2rem);
+    }
+
+    .about-content-wrapper {
+        min-width: 90vw;
+        max-width: 95vw;
+    }
+
+    .about-content-wrapper h2 {
+        font-size: 2rem;
+    }
+
+    .about-content h3 {
+        font-size: 1.2rem;
+    }
+
+    .about-content ul li {
+        font-size: 0.9rem;
+    }
+
+    .scoreboard-content {
+        min-width: 90vw;
+        max-width: 95vw;
+    }
+
+    .scoreboard-table {
+        font-size: 0.85rem;
+    }
+
+    .scoreboard-table th,
+    .scoreboard-table td {
+        padding: 0.5rem;
     }
 }

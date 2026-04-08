@@ -25,18 +25,37 @@
 
     <!-- Leaderboard Dialog -->
     <div id="leaderboardDialog" class="dialog-overlay" style="display: none;">
-        <div class="dialog-content">
-            <h2> LEADERBOARD</h2>
-            <div id="leaderboardList" class="leaderboard-list">
-                <p>No scores recorded yet!</p>
+        <div class="dialog-content scoreboard-content">
+            <h2>LEADERBOARD</h2>
+            <div class="scoreboard-container">
+                <table class="scoreboard-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Name</th>
+                            <th>Score</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboardBody">
+                        <!-- Scores will be inserted here -->
+                    </tbody>
+                </table>
             </div>
+
+            <div class="pagination-controls">
+                <button id="homePrevPageBtn" class="page-btn"><i class="fa-solid fa-chevron-left"></i></button>
+                <span id="homePageInfo">Page 1/1</span>
+                <button id="homeNextPageBtn" class="page-btn"><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+
             <button id="closeLeaderboardBtn" class="dialog-btn">BACK TO MENU</button>
         </div>
     </div>
 
     <!-- About Dialog -->
     <div id="aboutDialog" class="dialog-overlay" style="display: none;">
-        <div class="dialog-content">
+        <div class="dialog-content about-content-wrapper">
             <h2>About the Game</h2>
             <div class="about-content">
                 <h3>How to Play ?</h3>

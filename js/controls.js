@@ -1,7 +1,7 @@
 import { DOM, gameStates, showPopup } from "./config.js";
 import {squares,manageInvaders,initializeLevel,moveInvaders,initializeGrid,} from "./main.js";
 import {hideStoryPopup,addSound,showStoryPopup,storyContent,hideStoryModeSelection,showStoryModeSelection,} from "./story.js";
-import { scoreBoardSetup } from "./scoreboard.js";
+import { scoreBoardSetup, requestGameToken } from "./scoreboard.js";
 import { showLeaderboard } from "./home.js";
 
 // [ Key handlers (keydown and keyup) ]
@@ -189,17 +189,21 @@ export function resetWhenRichedBottom() {
     if (gameStates.storyMode) {
       addSound("mission-failed");
       showStoryPopup(storyContent.defeatConclusion);
-      DOM.storyContinueBtn.onclick = () => {
+      DOM.storyContinueBtn.onclick = async () => {
         hideStoryPopup();
         let name = prompt("Enter your name for the leaderboard:");
         const timeTaken = gameStates.gameTime - gameStates.remainingTime;
-        scoreBoardSetup(name, gameStates.result, timeTaken);
+        const token = await requestGameToken(gameStates.result, timeTaken);
+        scoreBoardSetup(name, gameStates.result, timeTaken, token);
       };
     } else {
       addSound("gameover");
-      let name = prompt("Enter your name for the leaderboard:");
-      const timeTaken = gameStates.gameTime - gameStates.remainingTime;
-      scoreBoardSetup(name, gameStates.result, timeTaken);
+      (async () => {
+        let name = prompt("Enter your name for the leaderboard:");
+        const timeTaken = gameStates.gameTime - gameStates.remainingTime;
+        const token = await requestGameToken(gameStates.result, timeTaken);
+        scoreBoardSetup(name, gameStates.result, timeTaken, token);
+      })();
     }
     endGame();
     return;
