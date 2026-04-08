@@ -1,9 +1,16 @@
 
 export function scoreBoardSetup(name, score, timeTaken) {
     // [ Sanitize & Validate name ]
-    if (name == null || name.trim() === "") name = "Anonymous";
+    if (name == null || name.trim() === "") {
+        // Generate random number for user name
+        const randomNum = Math.floor(Math.random() * 10000000);
+        name = `user${randomNum}`;
+    }
     if (name.length > 20) name = name.substring(0, 20);
-    if (!/^[a-zA-Z0-9 _-]+$/.test(name)) name = "Anonymous";
+    if (!/^[a-zA-Z0-9 _-]+$/.test(name)) {
+        const randomNum = Math.floor(Math.random() * 10000000);
+        name = `user${randomNum}`;
+    }
 
     // [ Convert seconds to MM:SS format ]
     const totalSeconds = parseInt(timeTaken);
@@ -11,11 +18,25 @@ export function scoreBoardSetup(name, score, timeTaken) {
     const seconds = totalSeconds % 60;
     const formattedTime = `${minutes}:${seconds.toString().padStart(2, "0")}`;
 
-    fetch("/scoreboard", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, score, timeTaken: formattedTime }),
-    })
+    // [ First, fetch existing scores to check for duplicates ]
+    fetch("/scoreboard")
+        .then((response) => response.json())
+        .then((existingScores) => {
+            // Check if name already exists
+            const nameExists = existingScores.some(entry => entry.name === name);
+            if (nameExists) {
+                // Add random number to the name
+                const randomNum = Math.floor(Math.random() * 10000);
+                name = `${name}${randomNum}`;
+            }
+
+            // Now submit the score with the validated name
+            return fetch("/scoreboard", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, score, timeTaken: formattedTime }),
+            });
+        })
         .then((response) => response.json())
         .then((data) => {
             console.log("Score submitted successfully", data);
